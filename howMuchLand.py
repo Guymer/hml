@@ -63,9 +63,9 @@ pad = 0.1                                                                       
 debug = True
 if debug:
     dpi = 150                                                                   # [px/in]
-    px *= 32.0                                                                  # [m]
-    nx //= 32                                                                   # [#]
-    ny //= 32                                                                   # [#]
+    px = 1024.0                                                                 # [m]
+    nx = 650                                                                    # [#]
+    ny = 650                                                                    # [#]
 
 # Create short-hand for the colour map ...
 cmap = matplotlib.pyplot.get_cmap("jet")

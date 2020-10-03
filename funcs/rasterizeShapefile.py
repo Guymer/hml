@@ -1,4 +1,4 @@
-def rasterizeShapefile(sfObj, px = 1024.0, nx = 650, ny = 650):
+def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     """
     Rasterize a ShapeFile.
 
@@ -10,9 +10,6 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 650, ny = 650):
     nx -- number of x pixels (default 650)
     ny -- number of y pixels (default 650)
     """
-
-    # Import standard modules ...
-    import math
 
     # Import special modules ...
     try:
@@ -28,13 +25,16 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 650, ny = 650):
     except:
         raise Exception("run \"pip install --user shapely\"")
 
+    # Import sub-functions ...
+    from .rasterizePolygon import rasterizePolygon
+
     # Check argument ...
     if not isinstance(sfObj, shapefile.Reader):
         raise TypeError("\"sfObj\" is not a shapefile.Reader")
 
-    # Initialize counter and grid ...
+    # Initialize counter and global grid ...
     n = 0                                                                       # [#]
-    grid = numpy.zeros((ny, nx), dtype = numpy.float32)                         # [m2]
+    globalGrid = numpy.zeros((ny, nx), dtype = numpy.float32)                   # [m2]
 
     # Loop over shape+record pairs ...
     for shapeRecord in sfObj.iterShapeRecords():
@@ -49,40 +49,17 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 650, ny = 650):
             n += 1                                                              # [#]
             continue
 
-        # Find bounding pixel indices ...
-        ix1 = math.floor(poly.bounds[0] / px)
-        iy1 = math.floor(poly.bounds[1] / px)
-        ix2 = math.ceil(poly.bounds[2] / px)
-        iy2 = math.ceil(poly.bounds[3] / px)
+        # Rasterize polygon ...
+        ix1, iy1, localGrid = rasterizePolygon(poly, px = px)
 
         # Loop over x-axis ...
-        for ix in range(ix1, ix2):
-            # Create short-hands ...
-            xmin = float(ix) * px                                               # [m]
-            xmax = float(ix + 1) * px                                           # [m]
-
+        for ix in range(localGrid.shape[1]):
             # Loop over y-axis ...
-            for iy in range(iy1, iy2):
-                # Create short-hands ...
-                ymin = float(iy) * px                                           # [m]
-                ymax = float(iy + 1) * px                                       # [m]
-
-                # Create a counter-clockwise polygon of the pixel, find its
-                # intersection with the polygon and add the area to the total
-                # grid ...
-                grid[iy, ix] += poly.intersection(
-                    shapely.geometry.polygon.Polygon(
-                        [
-                            (xmin, ymin),
-                            (xmax, ymin),
-                            (xmax, ymax),
-                            (xmin, ymax),
-                            (xmin, ymin),
-                        ]
-                    )
-                ).area                                                          # [m2]
+            for iy in range(localGrid.shape[0]):
+                # Add local grid to global grid ...
+                globalGrid[iy1 + iy, ix1 + ix] += localGrid[iy, ix]             # [m2]
 
     print("INFO: {:,d} records were skipped because they were invalid".format(n))
 
     # Return answer ...
-    return grid
+    return globalGrid
