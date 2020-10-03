@@ -51,16 +51,16 @@ except:
 
 # Set pixel size and extent of grid ...
 dpi = 300                                                                       # [px/in]
-px = 32.0                                                                       # [m]
-nx = 20800                                                                      # [#]
-ny = 20800                                                                      # [#]
+px = 128.0                                                                      # [m]
+nx = 5200                                                                       # [#]
+ny = 5200                                                                       # [#]
 
 # Set field-of-view and padding ...
 fov = 0.5                                                                       # [°]
 pad = 0.1                                                                       # [°]
 
 # Set mode and use it to override pixel size and extent of grid ...
-debug = True
+debug = False
 if debug:
     dpi = 150                                                                   # [px/in]
     px = 1024.0                                                                 # [m]
@@ -171,7 +171,7 @@ print("    ∴ height = {:,.1f}m".format(y2 - y1))
 print("I choose my pixels to be {:,.1f}m x {:,.1f}m as float32 values.".format(px, px))
 print("    ∴ nx needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(x2 / px), nx))
 print("    ∴ ny needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(y2 / px), ny))
-print("    ∴ each raster will be {:,.1f}MiB".format(nx * ny * 4.0 / (1024 * 1024)))
+print("    ∴ each raster will be {:,.1f}MiB".format(nx * ny * 4.0 / (1024.0 * 1024.0)))
 
 # ******************************************************************************
 
