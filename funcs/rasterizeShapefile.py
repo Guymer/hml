@@ -11,6 +11,9 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     ny -- number of y pixels (default 650)
     """
 
+    # Import standard modules ...
+    import multiprocessing
+
     # Import special modules ...
     try:
         import numpy
@@ -36,6 +39,10 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     n = 0                                                                       # [#]
     globalGrid = numpy.zeros((ny, nx), dtype = numpy.float32)                   # [m2]
 
+    # Create pool of workers and create empty list to hold the results ...
+    pool = multiprocessing.Pool(multiprocessing.cpu_count() - 1)
+    results = []
+
     # Loop over shape+record pairs ...
     for shapeRecord in sfObj.iterShapeRecords():
         # Crash if this shape+record is not a shapefile polygon ...
@@ -49,8 +56,15 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
             n += 1                                                              # [#]
             continue
 
-        # Rasterize polygon ...
-        ix1, iy1, localGrid = rasterizePolygon(poly, px = px)
+        # Add rasterization job to worker pool ...
+        results.append(pool.apply_async(rasterizePolygon, (poly,), {"px" : px}))
+
+    print("INFO: {:,d} records were skipped because they were invalid".format(n))
+
+    # Loop over results ...
+    for result in results:
+        # Get result ...
+        ix1, iy1, localGrid = result.get()
 
         # Loop over x-axis ...
         for ix in range(localGrid.shape[1]):
@@ -59,7 +73,9 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
                 # Add local grid to global grid ...
                 globalGrid[iy1 + iy, ix1 + ix] += localGrid[iy, ix]             # [m2]
 
-    print("INFO: {:,d} records were skipped because they were invalid".format(n))
+    # Destroy pool of workers ...
+    pool.close()
+    pool.join()
 
     # Return answer ...
     return globalGrid
