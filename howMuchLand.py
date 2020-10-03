@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Import standard modules ...
+import glob
 import io
 import json
 import math
@@ -14,16 +15,15 @@ try:
 except:
     raise Exception("run \"pip install --user cartopy\"")
 try:
-    import geojson
-    geojson.geometry.Geometry.__init__.__defaults__ = (None, False, 12)         # NOTE: https://github.com/jazzband/geojson/issues/135#issuecomment-596509669
-except:
-    raise Exception("run \"pip install --user geojson\"")
-try:
     import matplotlib
     matplotlib.use("Agg")                                                       # NOTE: https://matplotlib.org/gallery/user_interfaces/canvasagg.html
     import matplotlib.pyplot
 except:
     raise Exception("run \"pip install --user matplotlib\"")
+try:
+    import numpy
+except:
+    raise Exception("run \"pip install --user numpy\"")
 try:
     import shapefile
 except:
@@ -42,33 +42,30 @@ except:
     raise Exception("you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH")
 
 # NOTE: This script (and the ShapeFiles that it uses) works in the OSGB
-#       reference system whose coordinates are in metres from an origin off the
-#       south west coast of Cornwall. For further details see:
+#       reference system whose coordinates are Eastings/Northings (in metres)
+#       from an origin off the south west coast of Cornwall. For further details
+#       see:
 #         * https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#osgb
 #         * https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid
 #         * https://commons.wikimedia.org/wiki/File:Ordnance_Survey_National_Grid.svg
 
 # Set pixel size and extent of grid ...
-px = 32.0                                                                       # [m]
-nx = 21000                                                                      # [#]
-ny = 21000                                                                      # [#]
-
-# Set number of bearings and degree of simplification ...
 dpi = 300                                                                       # [px/in]
-nang = 361
-simp = 0.0001                                                                   # [°]
+px = 32.0                                                                       # [m]
+nx = 20800                                                                      # [#]
+ny = 20800                                                                      # [#]
 
 # Set field-of-view and padding ...
 fov = 0.5                                                                       # [°]
 pad = 0.1                                                                       # [°]
 
-# Set mode and use it to override number of bearings and degree of
-# simplification (if needed) ...
-debug = False
+# Set mode and use it to override pixel size and extent of grid ...
+debug = True
 if debug:
     dpi = 150                                                                   # [px/in]
-    nang = 9
-    simp = 0.1                                                                  # [°]
+    px *= 32.0                                                                  # [m]
+    nx //= 32                                                                   # [#]
+    ny //= 32                                                                   # [#]
 
 # Create short-hand for the colour map ...
 cmap = matplotlib.pyplot.get_cmap("jet")
@@ -171,16 +168,116 @@ print("    lower-left corner = ( {:,.1f}m , {:,.1f}m )".format(x1, y1))
 print("    upper-right corner = ( {:,.1f}m , {:,.1f}m )".format(x2, y2))
 print("    ∴ width = {:,.1f}m".format(x2 - x1))
 print("    ∴ height = {:,.1f}m".format(y2 - y1))
-print("I choose my pixels to be {:.0f}m x {:.0f}m as float32 values.".format(px, px))
-print("    ∴ nx needs to be >= {:,d}".format(math.ceil(x2 / 32.0)))
-print("    ∴ ny needs to be >= {:,d}".format(math.ceil(y2 / 32.0)))
+print("I choose my pixels to be {:,.1f}m x {:,.1f}m as float32 values.".format(px, px))
+print("    ∴ nx needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(x2 / px), nx))
+print("    ∴ ny needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(y2 / px), ny))
+print("    ∴ each raster will be {:,.1f}MiB".format(nx * ny * 4.0 / (1024 * 1024)))
+
+# ******************************************************************************
+
+# Check if the ZIP file needs rasterizing ...
+if not os.path.exists("alwaysOpen.bin"):
+    print("Rasterizing \"alwaysOpen.zip\" ...")
+
+    # Load dataset ...
+    with zipfile.ZipFile("alwaysOpen.zip", "r") as zfObj:
+        # Read files into RAM so that they become seekable ...
+        # NOTE: https://stackoverflow.com/a/12025492
+        dbfObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.dbf"))
+        shpObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shp"))
+        shxObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shx"))
+
+        # Open shapefile ...
+        sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+
+        # Rasterize and save to BIN ...
+        grid = funcs.rasterize(sfObj, px = px, nx = nx, ny = ny)
+        grid.tofile("alwaysOpen.bin")
+
+# ******************************************************************************
+
+# Check if the ZIP file needs rasterizing ...
+if not os.path.exists("limitedAccess.bin"):
+    print("Rasterizing \"limitedAccess.zip\" ...")
+
+    # Load dataset ...
+    with zipfile.ZipFile("limitedAccess.zip", "r") as zfObj:
+        # Read files into RAM so that they become seekable ...
+        # NOTE: https://stackoverflow.com/a/12025492
+        dbfObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.dbf"))
+        shpObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shp"))
+        shxObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shx"))
+
+        # Open shapefile ...
+        sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+
+        # Rasterize and save to BIN ...
+        grid = funcs.rasterize(sfObj, px = px, nx = nx, ny = ny)
+        grid.tofile("limitedAccess.bin")
+
+# ******************************************************************************
+
+# Check if the ZIP file needs rasterizing ...
+if not os.path.exists("openAccess.bin"):
+    print("Rasterizing \"openAccess.zip\" ...")
+
+    # Load dataset ...
+    with zipfile.ZipFile("openAccess.zip", "r") as zfObj:
+        # Read files into RAM so that they become seekable ...
+        # NOTE: https://stackoverflow.com/a/12025492
+        dbfObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.dbf"))
+        shpObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shp"))
+        shxObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shx"))
+
+        # Open shapefile ...
+        sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+
+        # Rasterize and save to BIN ...
+        grid = funcs.rasterize(sfObj, px = px, nx = nx, ny = ny)
+        grid.tofile("openAccess.bin")
+
+# ******************************************************************************
+
+# Check if the rasters needs merging ...
+if not os.path.exists("merged.bin"):
+    print("Merging rasters ...")
+
+    # Load all three rasters, add them together and save to BIN ...
+    # NOTE: I do not need to .reshape() them here as the total is being saved
+    #       back to the disk immediately.
+    (
+        numpy.fromfile("alwaysOpen.bin", dtype = numpy.float32) +
+        numpy.fromfile("limitedAccess.bin", dtype = numpy.float32) +
+        numpy.fromfile("openAccess.bin", dtype = numpy.float32)
+    ).tofile("merged.bin")
+
+# ******************************************************************************
+
+# Loop over BINs ...
+for bname in sorted(glob.glob("*.bin")):
+    # Deduce PNG name and skip this BIN if the PNG already exists ...
+    iname = bname[:-4] + ".png"
+    if os.path.exists(iname):
+        continue
+
+    print("Making \"{:s}\" ...".format(iname))
+
+    # Load BIN, flip it, scale it correctly and save as PNG ...
+    # NOTE: The OSGB reference system has positive axes from an origin in the
+    #       lower-left corner whereas the PNG reference system has positive axes
+    #       from an origin in the upper-left corner. Therefore, the y-axis needs
+    #       flipping before the BIN can be saved as a PNG.
+    grid = numpy.fromfile(bname, dtype = numpy.float32).reshape((ny, nx))       # [m2]
+    grid = numpy.flip(grid, axis = 0)                                           # [m2]
+    grid /= (px * px)                                                           # [fraction]
+    grid *= 255.0                                                               # [colour level]
+    numpy.place(grid, grid > 255.0, 255.0)                                      # [colour level]
+    numpy.place(grid, grid <   0.0,   0.0)                                      # [colour level]
+    pyguymer3.save_array_as_image(grid, iname, ct = "rainbow")
 
 # ******************************************************************************
 
 exit()
-
-# ******************************************************************************
-
 
 # Define locations ...
 locs = [
@@ -189,85 +286,6 @@ locs = [
     (53.378, -1.462, "Sheffield Train Station"  , "sheffield"  ),               # [°]. [°]
     (54.779, -1.583, "Durham Train Station"     , "durham"     ),               # [°]. [°]
 ]
-
-# Loop over locations ...
-for y, x, title, stub in locs:
-    print("Making \"{:s}\" ...".format(stub))
-
-    # Define bounding box ...
-    xmin, xmax, ymin, ymax = x - fov, x + fov, y - fov, y + fov                 # [°], [°], [°], [°]
-
-    # Deduce GeoJSON name and check what needs doing ...
-    fname = stub + ".geojson"
-    if os.path.exists(fname):
-        print("  Loading \"{:s}\" ...".format(fname))
-
-        # Load GeoJSON ...
-        multipoly = funcs.loadGeoJSON(fname)
-    else:
-        print("  Saving \"{:s}\" ...".format(fname))
-
-        # Initialize list ...
-        polys = []
-
-
-        print("    Unifying data ...")
-
-        # Create multipolygon ...
-        multipoly = shapely.ops.unary_union(polys)
-        if not multipoly.is_valid:
-            raise Exception("the generated MultiPolygon is not valid")
-
-        # Save GeoJSON ...
-        geojson.dump(
-            multipoly,
-            open(fname, "wt"),
-            ensure_ascii = False,
-            indent = 4,
-            sort_keys = True
-        )
-
-    # **************************************************************************
-
-    print("  Buffering data ...")
-
-    # Initialize float ...
-    dist = 0.0                                                                  # [m]
-
-    # Loop over distances ...
-    for i in range(6):
-        # Increment distance ...
-        dist += 500.0                                                           # [m]
-
-        # Deduce GeoJSON name and check what needs doing ...
-        fname = stub + "{:04.0f}m.geojson".format(dist)
-        if os.path.exists(fname):
-            print("    Buffering for {:.1f} km (loading \"{:s}\") ...".format(0.001 * dist, fname))
-
-            # Load GeoJSON ...
-            multipoly = funcs.loadGeoJSON(fname)
-        else:
-            print("    Buffering for {:.1f} km (saving \"{:s}\") ...".format(0.001 * dist, fname))
-
-            # Buffer MultiPolygon ...
-            multipoly = pyguymer3.buffer_multipolygon(multipoly, 500.0, nang = nang, simp = simp, debug = debug)
-
-            # Save GeoJSON ...
-            geojson.dump(
-                multipoly,
-                open(fname, "wt"),
-                ensure_ascii = False,
-                indent = 4,
-                sort_keys = True
-            )
-
-# NOTE: I break the loop here and do it again so that all of the GeoJSON files
-#       are made before any of the PNGs are made. This is because there is a bug
-#       in how "multiprocessing" works on newer versions of Mac OS X. This bug
-#       can be triggered in this script due to the use of "multiprocessing" in
-#       conjunction with "matplotlib". See:
-#         * https://github.com/matplotlib/matplotlib/issues/15410
-#         * https://bugs.python.org/issue33725
 
 # Loop over locations ...
 for y, x, title, stub in locs:
