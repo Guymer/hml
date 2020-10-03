@@ -14,3 +14,7 @@ HML requires the following Python modules to be installed and available in your 
 * [pyguymer3](https://github.com/Guymer/PyGuymer3)
 * [shapefile](https://pypi.org/project/pyshp)
 * [shapely](https://pypi.org/project/Shapely)
+
+## Notes
+
+* Ironically enough, now that this project uses `multiprocessing` to calculate the intersections, it actually spends more time making the PNGs than the BINs.
