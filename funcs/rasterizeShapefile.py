@@ -32,10 +32,6 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 650, ny = 650):
     if not isinstance(sfObj, shapefile.Reader):
         raise TypeError("\"sfObj\" is not a shapefile.Reader")
 
-    # **************************************************************************
-    # *                    STEP 1: CREATE LIST OF POLYGONS                     *
-    # **************************************************************************
-
     # Initialize counter and grid ...
     n = 0                                                                       # [#]
     grid = numpy.zeros((ny, nx), dtype = numpy.float32)                         # [m2]
