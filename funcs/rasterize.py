@@ -1,4 +1,4 @@
-def shapefile2bin(sfObj, px = 32.0, nx = 21000, ny = 21000):
+def rasterize(sfObj, px = 32.0, nx = 21000, ny = 21000):
     """
     Rasterize a ShapeFile.
 

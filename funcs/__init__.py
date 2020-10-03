@@ -3,7 +3,7 @@ import sys
 
 # Import sub-functions ...
 from .findExtent import findExtent
-from .shapefile2bin import shapefile2bin
+from .rasterize import rasterize
 
 # Ensure that this module is only imported by Python 3.x ...
 if sys.version_info.major != 3:
