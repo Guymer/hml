@@ -7,8 +7,12 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
 
     Keyword arguments:
     px -- pixel size (default 1024.0)
-    nx -- number of x pixels (default 650)
-    ny -- number of y pixels (default 650)
+    nx -- number of x pixels (default 1024)
+    ny -- number of y pixels (default 1024)
+
+    Note:
+    This function only works for ShapeFiles that solely exist in the (positive,
+    positive) quadrant.
     """
 
     # Import standard modules ...
