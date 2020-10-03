@@ -1,4 +1,4 @@
-def rasterize(sfObj, px = 1024.0, nx = 650, ny = 650):
+def rasterizeShapefile(sfObj, px = 1024.0, nx = 650, ny = 650):
     """
     Rasterize a ShapeFile.
 

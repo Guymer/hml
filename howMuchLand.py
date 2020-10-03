@@ -191,7 +191,7 @@ if not os.path.exists("alwaysOpen.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterize(sfObj, px = px, nx = nx, ny = ny)
+        grid = funcs.rasterizeShapefile(sfObj, px = px, nx = nx, ny = ny)
         grid.tofile("alwaysOpen.bin")
 
 # ******************************************************************************
@@ -212,7 +212,7 @@ if not os.path.exists("limitedAccess.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterize(sfObj, px = px, nx = nx, ny = ny)
+        grid = funcs.rasterizeShapefile(sfObj, px = px, nx = nx, ny = ny)
         grid.tofile("limitedAccess.bin")
 
 # ******************************************************************************
@@ -233,7 +233,7 @@ if not os.path.exists("openAccess.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterize(sfObj, px = px, nx = nx, ny = ny)
+        grid = funcs.rasterizeShapefile(sfObj, px = px, nx = nx, ny = ny)
         grid.tofile("openAccess.bin")
 
 # ******************************************************************************
