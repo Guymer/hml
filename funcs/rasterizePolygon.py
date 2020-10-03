@@ -3,10 +3,14 @@ def rasterizePolygon(poly, px = 1024.0):
     Rasterize a [Multi]Polygon.
 
     Arguments:
-    poly -- a [Multi]Polygon
+    poly -- a shapely.geometry.[multi]polygon.[Multi]Polygon
 
     Keyword arguments:
     px -- pixel size (default 1024.0)
+
+    Note:
+    This function only works for [Multi]Polygons that solely exist in the
+    (positive, positive) quadrant.
     """
 
     # Import standard modules ...
@@ -53,7 +57,8 @@ def rasterizePolygon(poly, px = 1024.0):
             ymax = float(iy1 + iy + 1) * px                                     # [m]
 
             # Create a counter-clockwise polygon of the pixel, find its
-            # intersection with the polygon and add the area to the local grid ...
+            # intersection with the [Multi]Polygon and add the area to the local
+            # grid ...
             localGrid[iy, ix] += poly.intersection(
                 shapely.geometry.polygon.Polygon(
                     [
