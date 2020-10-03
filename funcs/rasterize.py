@@ -1,4 +1,4 @@
-def rasterize(sfObj, px = 32.0, nx = 21000, ny = 21000):
+def rasterize(sfObj, px = 1024.0, nx = 650, ny = 650):
     """
     Rasterize a ShapeFile.
 
@@ -6,9 +6,9 @@ def rasterize(sfObj, px = 32.0, nx = 21000, ny = 21000):
     sfObj -- a shapefile.Reader of a ShapeFile
 
     Keyword arguments:
-    px -- pixel size (default 32.0)
-    nx -- number of x pixels (default 21000)
-    ny -- number of y pixels (default 21000)
+    px -- pixel size (default 1024.0)
+    nx -- number of x pixels (default 650)
+    ny -- number of y pixels (default 650)
     """
 
     # Import standard modules ...
