@@ -300,7 +300,7 @@ for y, x, title, stub in locs:
     if os.path.exists(stub + ".png"):
         continue
 
-    print("Making \"{:s}\" ...".format(stub))
+    print("Making \"{:s}.png\" ...".format(stub))
 
     # Define bounding box ...
     xmin, xmax, ymin, ymax = x - fov, x + fov, y - fov, y + fov                 # [°], [°], [°], [°]
