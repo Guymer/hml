@@ -3,6 +3,7 @@
 # Import standard modules ...
 import io
 import json
+import math
 import os
 import zipfile
 
@@ -39,6 +40,18 @@ try:
     import pyguymer3
 except:
     raise Exception("you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH")
+
+# NOTE: This script (and the ShapeFiles that it uses) works in the OSGB
+#       reference system whose coordinates are in metres from an origin off the
+#       south west coast of Cornwall. For further details see:
+#         * https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#osgb
+#         * https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid
+#         * https://commons.wikimedia.org/wiki/File:Ordnance_Survey_National_Grid.svg
+
+# Set pixel size and extent of grid ...
+px = 32.0                                                                       # [m]
+nx = 21000                                                                      # [#]
+ny = 21000                                                                      # [#]
 
 # Set number of bearings and degree of simplification ...
 dpi = 300                                                                       # [px/in]
@@ -91,6 +104,84 @@ sess.close()
 
 # ******************************************************************************
 
+# Initialize extents ...
+x1 = 1.0e10                                                                     # [m]
+y1 = 1.0e10                                                                     # [m]
+x2 = 0.0                                                                        # [m]
+y2 = 0.0                                                                        # [m]
+
+# ******************************************************************************
+
+print("Finding extent of \"alwaysOpen.zip\" ...")
+
+# Load dataset ...
+with zipfile.ZipFile("alwaysOpen.zip", "r") as zfObj:
+    # Read files into RAM so that they become seekable ...
+    # NOTE: https://stackoverflow.com/a/12025492
+    dbfObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.dbf"))
+    shpObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shp"))
+    shxObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shx"))
+
+    # Open shapefile ...
+    sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+
+    # Update extents ...
+    x1, y1, x2, y2 = funcs.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)# [m], [m], [m], [m]
+
+# ******************************************************************************
+
+print("Finding extent of \"limitedAccess.zip\" ...")
+
+# Load dataset ...
+with zipfile.ZipFile("limitedAccess.zip", "r") as zfObj:
+    # Read files into RAM so that they become seekable ...
+    # NOTE: https://stackoverflow.com/a/12025492
+    dbfObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.dbf"))
+    shpObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shp"))
+    shxObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shx"))
+
+    # Open shapefile ...
+    sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+
+    # Update extents ...
+    x1, y1, x2, y2 = funcs.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)# [m], [m], [m], [m]
+
+# ******************************************************************************
+
+print("Finding extent of \"openAccess.zip\" ...")
+
+# Load dataset ...
+with zipfile.ZipFile("openAccess.zip", "r") as zfObj:
+    # Read files into RAM so that they become seekable ...
+    # NOTE: https://stackoverflow.com/a/12025492
+    dbfObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.dbf"))
+    shpObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shp"))
+    shxObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shx"))
+
+    # Open shapefile ...
+    sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+
+    # Update extents ...
+    x1, y1, x2, y2 = funcs.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)# [m], [m], [m], [m]
+
+# ******************************************************************************
+
+print("The overall extent of the three datasets is:")
+print("    lower-left corner = ( {:,.1f}m , {:,.1f}m )".format(x1, y1))
+print("    upper-right corner = ( {:,.1f}m , {:,.1f}m )".format(x2, y2))
+print("    ∴ width = {:,.1f}m".format(x2 - x1))
+print("    ∴ height = {:,.1f}m".format(y2 - y1))
+print("I choose my pixels to be {:.0f}m x {:.0f}m as float32 values.".format(px, px))
+print("    ∴ nx needs to be >= {:,d}".format(math.ceil(x2 / 32.0)))
+print("    ∴ ny needs to be >= {:,d}".format(math.ceil(y2 / 32.0)))
+
+# ******************************************************************************
+
+exit()
+
+# ******************************************************************************
+
+
 # Define locations ...
 locs = [
     (51.268, -1.088, "Basingstoke Train Station", "basingstoke"),               # [°]. [°]
@@ -119,61 +210,6 @@ for y, x, title, stub in locs:
         # Initialize list ...
         polys = []
 
-        # **********************************************************************
-
-        print("    Loading \"alwaysOpen.zip\" ...")
-
-        # Load dataset ...
-        with zipfile.ZipFile("alwaysOpen.zip", "r") as zfObj:
-            # Read files into RAM so that they become seekable ...
-            # NOTE: https://stackoverflow.com/a/12025492
-            dbfObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.dbf"))
-            shpObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shp"))
-            shxObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shx"))
-
-            # Open shapefile ...
-            sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
-
-            # Load all [Multi]Polygons from the shapefile ...
-            polys += funcs.loadShapefile(sfObj, xmin, xmax, ymin, ymax, pad, simp = simp)
-
-        # **********************************************************************
-
-        print("    Loading \"limitedAccess.zip\" ...")
-
-        # Load dataset ...
-        with zipfile.ZipFile("limitedAccess.zip", "r") as zfObj:
-            # Read files into RAM so that they become seekable ...
-            # NOTE: https://stackoverflow.com/a/12025492
-            dbfObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.dbf"))
-            shpObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shp"))
-            shxObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shx"))
-
-            # Open shapefile ...
-            sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
-
-            # Load all [Multi]Polygons from the shapefile ...
-            polys += funcs.loadShapefile(sfObj, xmin, xmax, ymin, ymax, pad, simp = simp)
-
-        # **********************************************************************
-
-        print("    Loading \"openAccess.zip\" ...")
-
-        # Load dataset ...
-        with zipfile.ZipFile("openAccess.zip", "r") as zfObj:
-            # Read files into RAM so that they become seekable ...
-            # NOTE: https://stackoverflow.com/a/12025492
-            dbfObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.dbf"))
-            shpObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shp"))
-            shxObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shx"))
-
-            # Open shapefile ...
-            sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
-
-            # Load all [Multi]Polygons from the shapefile ...
-            polys += funcs.loadShapefile(sfObj, xmin, xmax, ymin, ymax, pad, simp = simp)
-
-        # **********************************************************************
 
         print("    Unifying data ...")
 
