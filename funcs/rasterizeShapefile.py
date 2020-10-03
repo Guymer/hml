@@ -50,10 +50,10 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 650, ny = 650):
             continue
 
         # Find bounding pixel indices ...
-        ix1 = math.floor(shapeRecord.shape.bbox[0] / px)
-        iy1 = math.floor(shapeRecord.shape.bbox[1] / px)
-        ix2 = math.ceil(shapeRecord.shape.bbox[2] / px)
-        iy2 = math.ceil(shapeRecord.shape.bbox[3] / px)
+        ix1 = math.floor(poly.bounds[0] / px)
+        iy1 = math.floor(poly.bounds[1] / px)
+        ix2 = math.ceil(poly.bounds[2] / px)
+        iy2 = math.ceil(poly.bounds[3] / px)
 
         # Loop over x-axis ...
         for ix in range(ix1, ix2):
