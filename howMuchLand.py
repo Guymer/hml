@@ -51,7 +51,7 @@ except:
 
 # Set pixel size and extent of grid ...
 dpi = 300                                                                       # [px/in]
-px = 128.0                                                                      # [m]
+px = 128                                                                        # [m]
 nx = 5200                                                                       # [#]
 ny = 5200                                                                       # [#]
 
@@ -63,9 +63,15 @@ pad = 0.1                                                                       
 debug = False
 if debug:
     dpi = 150                                                                   # [px/in]
-    px = 1024.0                                                                 # [m]
+    px = 1024                                                                   # [m]
     nx = 650                                                                    # [#]
     ny = 650                                                                    # [#]
+
+# ******************************************************************************
+
+# Check user input ...
+if not isinstance(px, int):
+    raise Exception("\"px\" must be an integer")
 
 # Create short-hand for the colour map ...
 cmap = matplotlib.pyplot.get_cmap("jet")
@@ -168,9 +174,9 @@ print("    lower-left corner = ( {:,.1f}m , {:,.1f}m )".format(x1, y1))
 print("    upper-right corner = ( {:,.1f}m , {:,.1f}m )".format(x2, y2))
 print("    ∴ width = {:,.1f}m".format(x2 - x1))
 print("    ∴ height = {:,.1f}m".format(y2 - y1))
-print("I choose my pixels to be {:,.1f}m x {:,.1f}m as float32 values.".format(px, px))
-print("    ∴ nx needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(x2 / px), nx))
-print("    ∴ ny needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(y2 / px), ny))
+print("I choose my pixels to be {:,d}m x {:,d}m as float32 values.".format(px, px))
+print("    ∴ nx needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(x2 / float(px)), nx))
+print("    ∴ ny needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(y2 / float(px)), ny))
 print("    ∴ each raster will be {:,.1f}MiB".format(nx * ny * 4.0 / (1024.0 * 1024.0)))
 
 # ******************************************************************************
@@ -191,7 +197,7 @@ if not os.path.exists("alwaysOpen.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterizeShapefile(sfObj, px = px, nx = nx, ny = ny)
+        grid = funcs.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
         grid.tofile("alwaysOpen.bin")
 
 # ******************************************************************************
@@ -212,7 +218,7 @@ if not os.path.exists("limitedAccess.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterizeShapefile(sfObj, px = px, nx = nx, ny = ny)
+        grid = funcs.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
         grid.tofile("limitedAccess.bin")
 
 # ******************************************************************************
@@ -233,7 +239,7 @@ if not os.path.exists("openAccess.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterizeShapefile(sfObj, px = px, nx = nx, ny = ny)
+        grid = funcs.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
         grid.tofile("openAccess.bin")
 
 # ******************************************************************************
@@ -269,7 +275,7 @@ for bname in sorted(glob.glob("*.bin")):
     #       flipping before the BIN can be saved as a PNG.
     grid = numpy.fromfile(bname, dtype = numpy.float32).reshape((ny, nx))       # [m2]
     grid = numpy.flip(grid, axis = 0)                                           # [m2]
-    grid /= (px * px)                                                           # [fraction]
+    grid /= float(px * px)                                                      # [fraction]
     grid *= 255.0                                                               # [colour level]
     numpy.place(grid, grid > 255.0, 255.0)                                      # [colour level]
     numpy.place(grid, grid <   0.0,   0.0)                                      # [colour level]
