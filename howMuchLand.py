@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # Import standard modules ...
+import copy
 import glob
 import io
 import json
@@ -28,11 +29,6 @@ try:
     import shapefile
 except:
     raise Exception("run \"pip install --user pyshp\"")
-try:
-    import shapely
-    import shapely.ops
-except:
-    raise Exception("run \"pip install --user shapely\"")
 
 # Import my modules ...
 import funcs
@@ -73,8 +69,12 @@ if debug:
 if not isinstance(px, int):
     raise Exception("\"px\" must be an integer")
 
-# Create short-hand for the colour map ...
-cmap = matplotlib.pyplot.get_cmap("jet")
+# Create copy of the colour map and hack the alpha values for our needs ...
+# NOTE: https://stackoverflow.com/a/10127675
+cmap = copy.copy(matplotlib.pyplot.get_cmap("jet"))
+cmap._init()
+for i in range(cmap.N):
+    cmap._lut[i, 3] = float(i) / float(cmap.N - 1)
 
 # Load tile metadata ...
 meta = json.load(open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt"))
@@ -283,8 +283,6 @@ for bname in sorted(glob.glob("*.bin")):
 
 # ******************************************************************************
 
-exit()
-
 # Define locations ...
 locs = [
     (51.268, -1.088, "Basingstoke Train Station", "basingstoke"),               # [°]. [°]
@@ -293,81 +291,29 @@ locs = [
     (54.779, -1.583, "Durham Train Station"     , "durham"     ),               # [°]. [°]
 ]
 
+# Load grid ...
+grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))    # [m2]
+
 # Loop over locations ...
 for y, x, title, stub in locs:
+    # Skip this plot if it already exists ...
+    if os.path.exists(stub + ".png"):
+        continue
+
     print("Making \"{:s}\" ...".format(stub))
 
     # Define bounding box ...
     xmin, xmax, ymin, ymax = x - fov, x + fov, y - fov, y + fov                 # [°], [°], [°], [°]
 
-    print("  Plotting data ...")
-
     # Create figure ...
     fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
     ax = matplotlib.pyplot.axes(projection = cartopy.crs.PlateCarree())
     ax.set_extent([xmin, xmax, ymin, ymax])
-    ax.set_title("Distance From NT & OA Land ({:s})".format(title))
+    ax.set_title("NT & OA Land Nearby ({:s})".format(title))
     if debug:
         ax.coastlines(resolution = "110m", color = "black", linewidth = 0.1)
     else:
         ax.coastlines(resolution = "10m", color = "black", linewidth = 0.1)
-
-    # Deduce GeoJSON name ...
-    fname = stub + ".geojson"
-
-    # Load GeoJSON ...
-    multipoly = funcs.loadGeoJSON(fname)
-
-    # Draw data ...
-    ax.add_geometries(
-        multipoly,
-        cartopy.crs.PlateCarree(),
-        alpha = 1.0,
-        edgecolor = "none",
-        facecolor = "red",
-    )
-
-    # Initialize float and lists ...
-    dist = 0.0                                                                  # [m]
-    labels = []
-    lines = []
-
-    # Loop over distances ...
-    for i in range(6):
-        # Increment distance ...
-        dist += 500.0                                                           # [m]
-
-        # Deduce GeoJSON name ...
-        fname = stub + "{:04.0f}m.geojson".format(dist)
-
-        # Load GeoJSON ...
-        multipoly = funcs.loadGeoJSON(fname)
-
-        # Draw data ...
-        if isinstance(multipoly, shapely.geometry.polygon.Polygon):
-            ax.add_geometries(
-                [multipoly],
-                cartopy.crs.PlateCarree(),
-                alpha = 1.0,
-                edgecolor = cmap(float(i) / 5.0),
-                facecolor = "none",
-                linewidth = 1.0
-            )
-        elif isinstance(multipoly, shapely.geometry.multipolygon.MultiPolygon):
-            ax.add_geometries(
-                multipoly,
-                cartopy.crs.PlateCarree(),
-                alpha = 1.0,
-                edgecolor = cmap(float(i) / 5.0),
-                facecolor = "none",
-                linewidth = 1.0
-            )
-        else:
-            raise TypeError("\"multipoly\" is not a [Multi]Polygon")
-
-        # Add entries for the legend ...
-        labels.append("{:.1f} km".format(0.001 * dist))
-        lines.append(matplotlib.lines.Line2D([], [], color = cmap(float(i) / 5.0)))
 
     # Draw background image ...
     ax.imshow(
@@ -381,8 +327,19 @@ for y, x, title, stub in locs:
         vmax = 1.0
     )
 
-    # Add legend and save figure ...
-    ax.legend(lines, labels, bbox_to_anchor = (1.0, 0.5), fontsize = "small", ncol = 1)
+    # Draw data ...
+    ax.imshow(
+        grid,
+        cmap = cmap,
+        extent = [0.0, nx * px, 0.0, ny * px],
+        interpolation = "bicubic",
+        origin = "lower",
+        transform = cartopy.crs.OSGB(),
+        vmin = 0.0,
+        vmax = float(px * px)
+    )
+
+    # Save figure ...
     fg.savefig(stub + ".png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
     if not debug:
         pyguymer3.optimize_image(stub + ".png", strip = True)
