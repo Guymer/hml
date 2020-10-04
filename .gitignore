@@ -17,6 +17,7 @@ shellcheck.log
 
 # Hide large datasets ...
 *.bin
+*.csv
 *.png
 *.zip
 OrdnanceSurveyBackgroundImages

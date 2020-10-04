@@ -50,9 +50,11 @@ except:
 #         * https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid
 #         * https://commons.wikimedia.org/wiki/File:Ordnance_Survey_National_Grid.svg
 
-# Set pixel size and extent of grid ...
+# Set pixel size, number of sub-divisions, number of radii and extent of grid ...
 dpi = 300                                                                       # [px/in]
 px = 128                                                                        # [m]
+ndiv = 128                                                                      # [#]
+nr = 128                                                                        # [#]
 nx = 5200                                                                       # [#]
 ny = 5200                                                                       # [#]
 
@@ -60,11 +62,14 @@ ny = 5200                                                                       
 fov = 0.5                                                                       # [°]
 pad = 0.1                                                                       # [°]
 
-# Set mode and use it to override pixel size and extent of grid ...
+# Set mode and use it to override pixel size, number of sub-divisions, number of
+# radii and extent of grid ...
 debug = False
 if debug:
     dpi = 150                                                                   # [px/in]
     px = 1024                                                                   # [m]
+    ndiv = 16                                                                   # [#]
+    nr = 16                                                                     # [#]
     nx = 650                                                                    # [#]
     ny = 650                                                                    # [#]
 
@@ -358,11 +363,32 @@ for lat, lon, title, stub in locs:
 
 # ******************************************************************************
 
+# Make radii ...
+radii = numpy.linspace(0.0, 100.0e3, num = nr)                                  # [m]
+
 # Loop over locations ...
 for lat, lon, title, stub in locs:
+    # Skip this CSV if it already exists ...
+    if os.path.exists(stub + ".csv"):
+        continue
+
+    print("Making \"{:s}.csv\" ...".format(stub))
+
     # Convert longitude/latitude to easting/northing ...
     x, y = convertbng.util.convert_bng(lon, lat)                                # [m], [m]
-    print(x, y)
-    exit()
 
-# TODO: go radially out and integrate to find out how much land there is nearby
+    # Open output file ...
+    with open(stub + ".csv", "wt") as fobj:
+        # Write header ...
+        fobj.write("radius [m],open area [m2]\n")
+
+        # Loop over radii (except the first one) ...
+        for ir in range(1, nr):
+            # Find out how much open land there is within this circle and save
+            # it to the CSV ...
+            fobj.write(
+                "{:e},{:e}\n".format(
+                    radii[ir],
+                    funcs.sumImageWithinCircle(grid, 0.0, nx * px, 0.0, ny * px, radii[ir], cx = x[0], cy = y[0], ndiv = ndiv),
+                )
+            )
