@@ -16,6 +16,11 @@ try:
 except:
     raise Exception("run \"pip install --user cartopy\"")
 try:
+    import convertbng
+    import convertbng.util
+except:
+    raise Exception("run \"pip install --user convertbng\"")
+try:
     import matplotlib
     matplotlib.use("Agg")                                                       # NOTE: https://matplotlib.org/gallery/user_interfaces/canvasagg.html
     import matplotlib.pyplot
@@ -294,8 +299,10 @@ locs = [
 # Load grid ...
 grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))    # [m2]
 
+# ******************************************************************************
+
 # Loop over locations ...
-for y, x, title, stub in locs:
+for lat, lon, title, stub in locs:
     # Skip this plot if it already exists ...
     if os.path.exists(stub + ".png"):
         continue
@@ -303,7 +310,7 @@ for y, x, title, stub in locs:
     print("Making \"{:s}.png\" ...".format(stub))
 
     # Define bounding box ...
-    xmin, xmax, ymin, ymax = x - fov, x + fov, y - fov, y + fov                 # [°], [°], [°], [°]
+    xmin, xmax, ymin, ymax = lon - fov, lon + fov, lat - fov, lat + fov         # [°], [°], [°], [°]
 
     # Create figure ...
     fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
@@ -348,3 +355,14 @@ for y, x, title, stub in locs:
     # Stop looping if debugging ...
     if debug:
         break
+
+# ******************************************************************************
+
+# Loop over locations ...
+for lat, lon, title, stub in locs:
+    # Convert longitude/latitude to easting/northing ...
+    x, y = convertbng.util.convert_bng(lon, lat)                                # [m], [m]
+    print(x, y)
+    exit()
+
+# TODO: go radially out and integrate to find out how much land there is nearby
