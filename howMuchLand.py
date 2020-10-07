@@ -393,3 +393,32 @@ for lat, lon, title, stub in locs:
                     funcs.sumImageWithinCircle(grid, 0.0, nx * px, 0.0, ny * px, radii[ir], cx = x[0], cy = y[0], ndiv = ndiv),
                 )
             )
+
+# ******************************************************************************
+
+# Create figure ...
+fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
+ax = matplotlib.pyplot.subplot()
+
+# Loop over locations ...
+for lat, lon, title, stub in locs:
+    # Plot data ...
+    x, y = numpy.loadtxt(stub + ".csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
+    ax.plot(x / 1.0e3, y / 1.0e6, label = title)
+
+# Plot theoretical maximum ...
+ax.plot(radii / 1.0e3, numpy.pi * pow(radii, 2) / 1.0e6, label = "(theoretical maximum)", linestyle = ":")
+
+# Save figure ...
+ax.grid(True)
+ax.legend(fontsize = "small", loc = "upper left")
+ax.set_title("How much National Trust or Open Access land is nearby?")
+ax.set_xlabel("Radius [km]")
+ax.set_xlim(left = 0.0)
+ax.set_ylabel("Area [km2]")
+ax.set_ylim(bottom = 0.0)
+ax.set_ylim(top = 6.0e3)
+fg.savefig("howMuchLand.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+if not debug:
+    pyguymer3.optimize_image("howMuchLand.png", strip = True)
+matplotlib.pyplot.close("all")
