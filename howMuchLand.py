@@ -421,3 +421,28 @@ fg.savefig("howMuchLand.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1
 if not debug:
     pyguymer3.optimize_image("howMuchLand.png", strip = True)
 matplotlib.pyplot.close("all")
+
+# ******************************************************************************
+
+# Create figure ...
+fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
+ax = matplotlib.pyplot.subplot()
+
+# Loop over locations ...
+for lat, lon, title, stub in locs:
+    # Plot data ...
+    x, y = numpy.loadtxt(stub + ".csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
+    ax.plot(x / 1.0e3, 100.0 * y / (numpy.pi * pow(x, 2)), label = title)
+
+# Save figure ...
+ax.grid(True)
+ax.legend(fontsize = "small", loc = "upper left")
+ax.set_title("How much National Trust or Open Access land is nearby?")
+ax.set_xlabel("Radius [km]")
+ax.set_xlim(radii[0], radii[-1] / 1.0e3)
+ax.set_ylabel("Area [%]")
+ax.set_ylim(0.0, 100.0)
+fg.savefig("howMuchLand2.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+if not debug:
+    pyguymer3.optimize_image("howMuchLand2.png", strip = True)
+matplotlib.pyplot.close("all")
