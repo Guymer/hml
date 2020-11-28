@@ -26,7 +26,7 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     try:
         import shapefile
     except:
-        raise Exception("\"pyshp\" is not installed; run \"pip install --user pyshp\"") from None
+        raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
     try:
         import shapely
     except:

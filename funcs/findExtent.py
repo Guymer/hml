@@ -17,7 +17,7 @@ def findExtent(sfObj, x1 = 1.0e10, y1 = 1.0e10, x2 = 0.0, y2 = 0.0):
     try:
         import shapefile
     except:
-        raise Exception("\"pyshp\" is not installed; run \"pip install --user pyshp\"") from None
+        raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
 
     # Check argument ...
     if not isinstance(sfObj, shapefile.Reader):
