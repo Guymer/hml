@@ -20,11 +20,11 @@ def rasterizePolygon(poly, px = 1024.0):
     try:
         import numpy
     except:
-        raise Exception("run \"pip install --user numpy\"")
+        raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
     try:
         import shapely
     except:
-        raise Exception("run \"pip install --user shapely\"")
+        raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
 
     # Check argument ...
     if not isinstance(poly, shapely.geometry.polygon.Polygon):

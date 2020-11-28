@@ -14,26 +14,26 @@ try:
     import cartopy
     import cartopy.crs
 except:
-    raise Exception("run \"pip install --user cartopy\"")
+    raise Exception("\"cartopy\" is not installed; run \"pip install --user Cartopy\"") from None
 try:
     import convertbng
     import convertbng.util
 except:
-    raise Exception("run \"pip install --user convertbng\"")
+    raise Exception("\"convertbng\" is not installed; run \"pip install --user convertbng\"") from None
 try:
     import matplotlib
     matplotlib.use("Agg")                                                       # NOTE: https://matplotlib.org/gallery/user_interfaces/canvasagg.html
     import matplotlib.pyplot
 except:
-    raise Exception("run \"pip install --user matplotlib\"")
+    raise Exception("\"matplotlib\" is not installed; run \"pip install --user matplotlib\"") from None
 try:
     import numpy
 except:
-    raise Exception("run \"pip install --user numpy\"")
+    raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 try:
     import shapefile
 except:
-    raise Exception("run \"pip install --user pyshp\"")
+    raise Exception("\"pyshp\" is not installed; run \"pip install --user pyshp\"") from None
 
 # Import my modules ...
 import funcs
@@ -77,7 +77,7 @@ if debug:
 
 # Check user input ...
 if not isinstance(px, int):
-    raise Exception("\"px\" must be an integer")
+    raise Exception("\"px\" must be an integer") from None
 
 # Create copy of the colour map and hack the alpha values for our needs ...
 # NOTE: https://stackoverflow.com/a/10127675

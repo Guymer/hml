@@ -23,7 +23,7 @@ def sumImageWithinCircle(img, xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.0, ndi
     try:
         import numpy
     except:
-        raise Exception("run \"pip install --user numpy\"")
+        raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 
     # Import sub-functions ...
     from .findFractionOfPixelWithinCircle import findFractionOfPixelWithinCircle

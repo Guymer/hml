@@ -22,7 +22,7 @@ def findFractionOfPixelWithinCircle(xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.
     try:
         import numpy
     except:
-        raise Exception("run \"pip install --user numpy\"")
+        raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 
     # Create nodes relative to the centre of the circle ...
     xaxis = numpy.linspace(xmin, xmax, num = ndiv + 1) - cx

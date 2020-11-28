@@ -22,15 +22,15 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     try:
         import numpy
     except:
-        raise Exception("run \"pip install --user numpy\"")
+        raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
     try:
         import shapefile
     except:
-        raise Exception("run \"pip install --user pyshp\"")
+        raise Exception("\"pyshp\" is not installed; run \"pip install --user pyshp\"") from None
     try:
         import shapely
     except:
-        raise Exception("run \"pip install --user shapely\"")
+        raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
 
     # Import sub-functions ...
     from .rasterizePolygon import rasterizePolygon
@@ -51,7 +51,7 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     for shapeRecord in sfObj.iterShapeRecords():
         # Crash if this shape+record is not a shapefile polygon ...
         if shapeRecord.shape.shapeType != shapefile.POLYGON:
-            raise Exception("\"shape\" is not a POLYGON")
+            raise Exception("\"shape\" is not a POLYGON") from None
 
         # Convert shapefile.Shape to shapely.geometry.polygon.Polygon or
         # shapely.geometry.multipolygon.MultiPolygon ...

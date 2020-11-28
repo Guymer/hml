@@ -17,7 +17,7 @@ def findExtent(sfObj, x1 = 1.0e10, y1 = 1.0e10, x2 = 0.0, y2 = 0.0):
     try:
         import shapefile
     except:
-        raise Exception("run \"pip install --user pyshp\"")
+        raise Exception("\"pyshp\" is not installed; run \"pip install --user pyshp\"") from None
 
     # Check argument ...
     if not isinstance(sfObj, shapefile.Reader):
@@ -27,7 +27,7 @@ def findExtent(sfObj, x1 = 1.0e10, y1 = 1.0e10, x2 = 0.0, y2 = 0.0):
     for shapeRecord in sfObj.iterShapeRecords():
         # Crash if this shape+record is not a shapefile polygon ...
         if shapeRecord.shape.shapeType != shapefile.POLYGON:
-            raise Exception("\"shape\" is not a POLYGON")
+            raise Exception("\"shape\" is not a POLYGON") from None
 
         # Update extents ...
         x1 = min(x1, shapeRecord.shape.bbox[0])                                 # [m]
