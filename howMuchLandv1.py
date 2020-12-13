@@ -417,9 +417,9 @@ ax.set_xlabel("Radius [km]")
 ax.set_xlim(radii[0], radii[-1] / 1.0e3)
 ax.set_ylabel("Area [km2]")
 ax.set_ylim(0.0, 6.0e3)
-fg.savefig("howMuchLand.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+fg.savefig("howMuchLandv1_plot1.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
 if not debug:
-    pyguymer3.optimize_image("howMuchLand.png", strip = True)
+    pyguymer3.optimize_image("howMuchLandv1_plot1.png", strip = True)
 matplotlib.pyplot.close("all")
 
 # ******************************************************************************
@@ -442,7 +442,7 @@ ax.set_xlabel("Radius [km]")
 ax.set_xlim(radii[0], radii[-1] / 1.0e3)
 ax.set_ylabel("Area [%]")
 ax.set_ylim(0.0, 100.0)
-fg.savefig("howMuchLand2.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+fg.savefig("howMuchLandv1_plot2.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
 if not debug:
-    pyguymer3.optimize_image("howMuchLand2.png", strip = True)
+    pyguymer3.optimize_image("howMuchLandv1_plot2.png", strip = True)
 matplotlib.pyplot.close("all")
