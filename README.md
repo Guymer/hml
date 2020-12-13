@@ -2,7 +2,7 @@
 
 This project aims to show how much National Trust or Open Access land is nearby.
 
-[The script](howMuchLand.py) rasterizes three vector datasets onto a grid of pixels covering Great Britain with each pixel containing the total area of National Trust or Open Access land within.
+[The script](howMuchLandv1.py) rasterizes three vector datasets onto a grid of pixels covering Great Britain with each pixel containing the total area of National Trust or Open Access land within.
 
 ## Dependencies
 
