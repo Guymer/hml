@@ -135,3 +135,6 @@ pyguymer3.optimize_image("howMuchLandv2_plot1.png", strip = True)
 matplotlib.pyplot.close("all")
 
 # ******************************************************************************
+
+# TODO: Loop over railway stations and find which ones have the most National
+#       Trust or Open Access land nearby.
