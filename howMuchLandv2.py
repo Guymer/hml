@@ -132,7 +132,7 @@ ax.imshow(
 # Save figure ...
 fg.savefig("howMuchLandv2_plot1.png", bbox_inches = "tight", dpi = 300, pad_inches = 0.1)
 pyguymer3.optimize_image("howMuchLandv2_plot1.png", strip = True)
-matplotlib.pyplot.close("all")
+matplotlib.pyplot.close(fg)
 
 # ******************************************************************************
 

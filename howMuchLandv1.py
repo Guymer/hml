@@ -356,7 +356,7 @@ for lat, lon, title, stub in locs:
     fg.savefig(stub + ".png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
     if not debug:
         pyguymer3.optimize_image(stub + ".png", strip = True)
-    matplotlib.pyplot.close("all")
+    matplotlib.pyplot.close(fg)
 
     # Stop looping if debugging ...
     if debug:
@@ -420,7 +420,7 @@ ax.set_ylim(0.0, 6.0e3)
 fg.savefig("howMuchLandv1_plot1.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
 if not debug:
     pyguymer3.optimize_image("howMuchLandv1_plot1.png", strip = True)
-matplotlib.pyplot.close("all")
+matplotlib.pyplot.close(fg)
 
 # ******************************************************************************
 
@@ -445,4 +445,4 @@ ax.set_ylim(0.0, 100.0)
 fg.savefig("howMuchLandv1_plot2.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
 if not debug:
     pyguymer3.optimize_image("howMuchLandv1_plot2.png", strip = True)
-matplotlib.pyplot.close("all")
+matplotlib.pyplot.close(fg)
