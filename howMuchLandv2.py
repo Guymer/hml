@@ -136,5 +136,9 @@ matplotlib.pyplot.close("all")
 
 # ******************************************************************************
 
+# TODO: When writing a blog about this study, don't forget to include the
+#       following Gist:
+#         * https://gist.github.com/Guymer/12cc96b8062d3f104fa19597a93accaf
+
 # TODO: Loop over railway stations and find which ones have the most National
 #       Trust or Open Access land nearby.
