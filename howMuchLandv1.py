@@ -50,7 +50,8 @@ except:
 #         * https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid
 #         * https://commons.wikimedia.org/wiki/File:Ordnance_Survey_National_Grid.svg
 
-# Set pixel size, number of sub-divisions, number of radii and extent of grid ...
+# Set resolution, pixel size, number of sub-divisions, number of radii and
+# extent of grid ...
 dpi = 300                                                                       # [px/in]
 px = 128                                                                        # [m]
 ndiv = 128                                                                      # [#]
@@ -62,8 +63,8 @@ ny = 5200                                                                       
 fov = 0.5                                                                       # [°]
 pad = 0.1                                                                       # [°]
 
-# Set mode and use it to override pixel size, number of sub-divisions, number of
-# radii and extent of grid ...
+# Set mode and use it to override resolution, pixel size, number of
+# sub-divisions, number of radii and extent of grid ...
 debug = False
 if debug:
     dpi = 150                                                                   # [px/in]
@@ -390,7 +391,17 @@ for lat, lon, title, stub in locs:
             fobj.write(
                 "{:e},{:e}\n".format(
                     radii[ir],
-                    funcs.sumImageWithinCircle(grid, 0.0, nx * px, 0.0, ny * px, radii[ir], cx = x[0], cy = y[0], ndiv = ndiv),
+                    funcs.sumImageWithinCircle(
+                        grid,
+                        0.0,
+                        nx * px,
+                        0.0,
+                        ny * px,
+                        radii[ir],
+                        cx = x[0],
+                        cy = y[0],
+                        ndiv = ndiv
+                    ),
                 )
             )
 
