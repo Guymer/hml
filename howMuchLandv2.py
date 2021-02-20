@@ -2,6 +2,7 @@
 
 # Import standard modules ...
 import csv
+import json
 import math
 import os
 import zipfile
@@ -66,28 +67,70 @@ sess.close()
 
 # ******************************************************************************
 
-# Initialize lists ...
-easts = []                                                                      # [m]
-norths = []                                                                     # [m]
+# Check if the JSON database exists ...
+if os.path.exists("howMuchLandv2.json"):
+    # Load database ...
+    data = json.load(open("howMuchLandv2.json", "rt"))
 
-# Load dataset ...
-with zipfile.ZipFile("NaPTANcsv.zip", "r") as zfObj:
-    # Load CSV file into RAM as a UTF-8 string and remove erroneous NULL bytes ...
-    csvSrc = zfObj.read("StopAreas.csv").decode("utf-8").replace("\x00", "")
+    # Initialize lists ...
+    names = []
+    easts = []                                                                  # [m]
+    norths = []                                                                 # [m]
+    lons = []                                                                   # [°]
+    lats = []                                                                   # [°]
 
-    # Loop over rows ...
-    for row in csv.DictReader(csvSrc.splitlines()):
-        # Skip row if it is not a railway station ...
-        # NOTE: http://naptan.dft.gov.uk/naptan/stopTypes.htm
-        if row["StopAreaType"] != "GRLS":
-            continue
+    # Un-merge dictionary in to lists ...
+    for name, info in data.items():
+        names.append(name)
+        easts.append(info["easting"])                                           # [m]
+        norths.append(info["northing"])                                         # [m]
+        lons.append(info["longitude"])                                          # [°]
+        lats.append(info["latitude"])                                           # [°]
+else:
+    # Initialize lists ...
+    names = []
+    easts = []                                                                  # [m]
+    norths = []                                                                 # [m]
 
-        # Append easting and northing to lists ...
-        easts.append(int(row["Easting"]))                                       # [m]
-        norths.append(int(row["Northing"]))                                     # [m]
+    # Load dataset ...
+    with zipfile.ZipFile("NaPTANcsv.zip", "r") as zfObj:
+        # Load CSV file into RAM as a UTF-8 string and remove erroneous NULL
+        # bytes ...
+        csvSrc = zfObj.read("StopAreas.csv").decode("utf-8").replace("\x00", "")
 
-# Convert eastings and northings to longitudes and latitudes ...
-lons, lats = convertbng.util.convert_lonlat(easts, norths)                      # [°], [°]
+        # Loop over rows ...
+        for row in csv.DictReader(csvSrc.splitlines()):
+            # Skip row if it is not a railway station ...
+            # NOTE: http://naptan.dft.gov.uk/naptan/stopTypes.htm
+            if row["StopAreaType"] != "GRLS":
+                continue
+
+            # Append easting and northing to lists ...
+            names.append(row["Name"])
+            easts.append(int(row["Easting"]))                                   # [m]
+            norths.append(int(row["Northing"]))                                 # [m]
+
+    # Convert eastings and northings to longitudes and latitudes ...
+    lons, lats = convertbng.util.convert_lonlat(easts, norths)                  # [°], [°]
+
+    # Merge lists in to a dictionary ...
+    data = {}
+    for name, east, north, lon, lat in zip(names, easts, norths, lons, lats):
+        data[name] = {
+            "easting" : east,                                                   # [m]
+            "northing" : north,                                                 # [m]
+            "longitude" : lon,                                                  # [°]
+            "latitude" : lat,                                                   # [°]
+        }
+
+    # Save database ...
+    json.dump(
+        data,
+        open("howMuchLandv2.json", "wt"),
+        ensure_ascii = False,
+        indent = 4,
+        sort_keys = True
+    )
 
 # ******************************************************************************
 
