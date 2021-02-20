@@ -33,7 +33,7 @@ def findFractionOfPixelWithinCircle(xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.
     xaxis = 0.5 * (xaxis[1:] + xaxis[:-1])
     yaxis = 0.5 * (yaxis[1:] + yaxis[:-1])
 
-    # Find out the distance of each corner to the centre of the circle ...
+    # Find out the distance of each centroid to the centre of the circle ...
     dist = numpy.zeros((ndiv, ndiv), dtype = numpy.float64)
     for ix in range(ndiv):
         for iy in range(ndiv):
