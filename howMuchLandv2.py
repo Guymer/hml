@@ -188,7 +188,7 @@ grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))    
 radii = numpy.linspace(0.0, 50.0e3, num = 6)                                    # [m]
 
 # Loop over stations ...
-for name in data:
+for name in names:
     print(f"Integrating around \"{name}\" ...")
 
     # Initialize dictionary ...
@@ -228,9 +228,36 @@ json.dump(
 
 # ******************************************************************************
 
+# Loop over radii (except the first one) ...
+for ir in range(1, radii.size):
+    # Deduce key name ...
+    key = f"{round(radii[ir]):,d}m"
+
+    print(f"Sumarising for a radius of {key} ...")
+
+    # Initialize array ...
+    areas = numpy.zeros(len(names), dtype = numpy.float64)                      # [m2]
+
+    # Loop over stations ...
+    for i, name in enumerate(names):
+        # Populate array ...
+        areas[i] = data[name]["integrals"][key]                                 # [m2]
+
+    # Find the (reverse) sorted keys ...
+    keys = areas.argsort()[::-1]
+
+    # Find area of circle ...
+    area = numpy.pi * (radii[ir] ** 2)                                          # [m2]
+
+    # Loop over Top 10 ...
+    for i in range(10):
+        # Calculate percentage open area ...
+        perc = 100.0 * areas[keys[i]] / area                                    # [%]
+
+        print(f" > {names[keys[i]]:40s} : {perc:6.3f} %")
+
+# ******************************************************************************
+
 # TODO: When writing a blog about this study, don't forget to include the
 #       following Gist:
 #         * https://gist.github.com/Guymer/12cc96b8062d3f104fa19597a93accaf
-
-# TODO: Loop over railway stations and find which ones have the most National
-#       Trust or Open Access land nearby.
