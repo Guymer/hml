@@ -36,8 +36,8 @@ except:
     raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
 
 # Import my modules ...
-import funcs
 import f90
+import funcs
 try:
     import pyguymer3
 except:

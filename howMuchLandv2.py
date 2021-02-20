@@ -30,8 +30,8 @@ except:
     raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 
 # Import my modules ...
-import funcs
 import f90
+import funcs
 try:
     import pyguymer3
 except:
