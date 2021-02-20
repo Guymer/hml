@@ -15,6 +15,10 @@ __pycache__
 pylint.log
 shellcheck.log
 
+# Ignore compiler generated files ...
+*.so
+*.so.dSYM
+
 # Hide large datasets ...
 *.bin
 *.csv
