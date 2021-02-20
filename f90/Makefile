@@ -86,7 +86,7 @@ f90.cpython-38m-darwin.so:	$(FC1)												\
 							$(FC2)												\
 							f90.F90												\
 							src/*.f90
-	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="$(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -m f90 f90.F90 -L$(LIBDIR)
+	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -m f90 -lgomp f90.F90 -L$(LIBDIR)
 
 f90.so:						$(LN)												\
 							f90.cpython-38m-darwin.so

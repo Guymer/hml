@@ -1,4 +1,4 @@
-PURE SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx, cy, img, tot)
+SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx, cy, img, tot)
     ! Import standard modules ...
     USE ISO_C_BINDING
 
@@ -32,60 +32,93 @@ PURE SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx
     dx = (xmax - xmin) / REAL(nx, kind = C_DOUBLE)
     dy = (ymax - ymin) / REAL(ny, kind = C_DOUBLE)
 
-    ! Create nodes relative to the centre of the circle ...
-    DO ix = 1_C_LONG_LONG, nx + 1_C_LONG_LONG
-        xaxis(ix) = xmin + REAL(ix - 1_C_LONG_LONG, kind = C_DOUBLE) * dx - cx
-    END DO
-
-    ! Create nodes relative to the centre of the circle ...
-    DO iy = 1_C_LONG_LONG, ny + 1_C_LONG_LONG
-        yaxis(iy) = ymin + REAL(iy - 1_C_LONG_LONG, kind = C_DOUBLE) * dy - cy
-    END DO
-
-    ! Find out the distance of each node to the centre of the circle ...
-    DO ix = 1_C_LONG_LONG, nx + 1_C_LONG_LONG
-        DO iy = 1_C_LONG_LONG, ny + 1_C_LONG_LONG
-            dist(iy, ix) = HYPOT(xaxis(ix), yaxis(iy))
-        END DO
-    END DO
-
     ! Initialize total ...
     tot = 0.0e0_C_DOUBLE
 
-    ! Loop over x-axis ...
-    DO ix = 1_C_LONG_LONG, nx
-        ! Loop over y-axis ...
-        DO iy = 1_C_LONG_LONG, ny
-            ! Skip this pixel if it is empty ...
-            IF(img(iy, ix) == 0.0e0_C_DOUBLE)THEN
-                CYCLE
-            END IF
+    !$omp parallel                                                              &
+    !$omp default(none)                                                         &
+    !$omp private(frac)                                                         &
+    !$omp private(ix)                                                           &
+    !$omp private(iy)                                                           &
+    !$omp shared(cx)                                                            &
+    !$omp shared(cy)                                                            &
+    !$omp shared(dist)                                                          &
+    !$omp shared(dx)                                                            &
+    !$omp shared(dy)                                                            &
+    !$omp shared(img)                                                           &
+    !$omp shared(ndiv)                                                          &
+    !$omp shared(nx)                                                            &
+    !$omp shared(ny)                                                            &
+    !$omp shared(r)                                                             &
+    !$omp shared(xaxis)                                                         &
+    !$omp shared(xmin)                                                          &
+    !$omp shared(yaxis)                                                         &
+    !$omp shared(ymin)                                                          &
+    !$omp reduction(+:tot)
+        !$omp do                                                                &
+        !$omp schedule(dynamic)
+            ! Create nodes relative to the centre of the circle ...
+            DO ix = 1_C_LONG_LONG, nx + 1_C_LONG_LONG
+                xaxis(ix) = xmin + REAL(ix - 1_C_LONG_LONG, kind = C_DOUBLE) * dx - cx
+            END DO
+        !$omp end do
 
-            ! Skip this pixel if it is all outside of the circle ...
-            IF(ALL(dist(iy:iy + 1_C_LONG_LONG, ix:ix + 1_C_LONG_LONG) >= r))THEN
-                CYCLE
-            END IF
+        !$omp do                                                                &
+        !$omp schedule(dynamic)
+            ! Create nodes relative to the centre of the circle ...
+            DO iy = 1_C_LONG_LONG, ny + 1_C_LONG_LONG
+                yaxis(iy) = ymin + REAL(iy - 1_C_LONG_LONG, kind = C_DOUBLE) * dy - cy
+            END DO
+        !$omp end do
 
-            ! Check if this pixel is entirely within the circle or if it
-            ! straddles the circumference ...
-            IF(ALL(dist(iy:iy + 1_C_LONG_LONG, ix:ix + 1_C_LONG_LONG) <= r))THEN
-                ! Add all of the value to total ...
-                tot = tot + img(iy, ix)
-            ELSE
-                ! Add part of the value to total ...
-                CALL findFractionOfPixelWithinCircle(                           &
-                    ndiv = ndiv,                                                &
-                    xmin = xaxis(ix),                                           &
-                    xmax = xaxis(ix + 1_C_LONG_LONG),                           &
-                    ymin = yaxis(iy),                                           &
-                    ymax = yaxis(iy + 1_C_LONG_LONG),                           &
-                    r = r,                                                      &
-                    cx = 0.0e0_C_DOUBLE,                                        &
-                    cy = 0.0e0_C_DOUBLE,                                        &
-                    frac = frac                                                 &
-                )
-                tot = tot + img(iy, ix) * frac
-            END IF
-        END DO
-    END DO
+        !$omp do                                                                &
+        !$omp schedule(dynamic)
+            ! Find out the distance of each node to the centre of the circle ...
+            DO ix = 1_C_LONG_LONG, nx + 1_C_LONG_LONG
+                DO iy = 1_C_LONG_LONG, ny + 1_C_LONG_LONG
+                    dist(iy, ix) = HYPOT(xaxis(ix), yaxis(iy))
+                END DO
+            END DO
+        !$omp end do
+
+        !$omp do                                                                &
+        !$omp schedule(dynamic)
+            ! Loop over x-axis ...
+            DO ix = 1_C_LONG_LONG, nx
+                ! Loop over y-axis ...
+                DO iy = 1_C_LONG_LONG, ny
+                    ! Skip this pixel if it is empty ...
+                    IF(img(iy, ix) == 0.0e0_C_DOUBLE)THEN
+                        CYCLE
+                    END IF
+
+                    ! Skip this pixel if it is all outside of the circle ...
+                    IF(ALL(dist(iy:iy + 1_C_LONG_LONG, ix:ix + 1_C_LONG_LONG) >= r))THEN
+                        CYCLE
+                    END IF
+
+                    ! Check if this pixel is entirely within the circle or if it
+                    ! straddles the circumference ...
+                    IF(ALL(dist(iy:iy + 1_C_LONG_LONG, ix:ix + 1_C_LONG_LONG) <= r))THEN
+                        ! Add all of the value to total ...
+                        tot = tot + img(iy, ix)
+                    ELSE
+                        ! Add part of the value to total ...
+                        CALL findFractionOfPixelWithinCircle(                   &
+                            ndiv = ndiv,                                        &
+                            xmin = xaxis(ix),                                   &
+                            xmax = xaxis(ix + 1_C_LONG_LONG),                   &
+                            ymin = yaxis(iy),                                   &
+                            ymax = yaxis(iy + 1_C_LONG_LONG),                   &
+                            r = r,                                              &
+                            cx = 0.0e0_C_DOUBLE,                                &
+                            cy = 0.0e0_C_DOUBLE,                                &
+                            frac = frac                                         &
+                        )
+                        tot = tot + img(iy, ix) * frac
+                    END IF
+                END DO
+            END DO
+        !$omp end do
+    !$omp end parallel
 END SUBROUTINE sumImageWithinCircle
