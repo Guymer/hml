@@ -30,31 +30,12 @@ except:
     raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 
 # Import my modules ...
+import funcs
 import f90
 try:
     import pyguymer3
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
-
-# ******************************************************************************
-
-# Define function ...
-def calc_horizontal_gridlines(yloc, ext):
-    x = []                                                                      # [°]
-    y = []                                                                      # [°]
-    for xloc in range(int(round(ext[0])), int(round(ext[1])) + 1):
-        x.append(xloc)                                                          # [°]
-        y.append(yloc)                                                          # [°]
-    return x, y
-
-# Define function ...
-def calc_vertical_gridlines(xloc, ext):
-    x = []                                                                      # [°]
-    y = []                                                                      # [°]
-    for yloc in range(int(round(ext[2])), int(round(ext[3])) + 1):
-        x.append(xloc)                                                          # [°]
-        y.append(yloc)                                                          # [°]
-    return x, y
 
 # ******************************************************************************
 
@@ -170,10 +151,10 @@ ax.coastlines(resolution = "10m", color = "white", linewidth = 0.5)
 
 # Add grid lines manually ...
 for loc in range(math.ceil(xmin), math.floor(xmax) + 1):
-    xlocs, ylocs = calc_vertical_gridlines(loc, extent)                         # [°], [°], [°], [°]
+    xlocs, ylocs = funcs.calcVerticalGridlines(loc, extent)                     # [°], [°], [°], [°]
     ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
 for loc in range(math.ceil(ymin), math.floor(ymax) + 1):
-    xlocs, ylocs = calc_horizontal_gridlines(loc, extent)                       # [°], [°], [°], [°]
+    xlocs, ylocs = funcs.calcHorizontalGridlines(loc, extent)                   # [°], [°], [°], [°]
     ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
 
 # Plot railway stations ...
