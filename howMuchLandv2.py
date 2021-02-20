@@ -135,26 +135,30 @@ else:
 
 # ******************************************************************************
 
-# Define bounding box ...
+# Define bounding box (for the first plot) ...
 xmin, xmax, ymin, ymax = -8.5, 2.5, 49.5, 56.0                                  # [°], [°], [°], [°]
-extent = [xmin, xmax, ymin, ymax]                                               # [°], [°], [°], [°]
+extent1 = [xmin, xmax, ymin, ymax]                                              # [°], [°], [°], [°]
+
+# Define bounding box (for the second plots) ...
+midx, midy = -2.0, 52.5                                                         # [°], [°]
+extent2 = [midx - 3.75, midx + 3.75, midy - 2.5, midy + 2.5]                    # [°], [°], [°], [°]
 
 # ******************************************************************************
 
 # Create figure ...
 fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
 ax = matplotlib.pyplot.axes(projection = cartopy.crs.PlateCarree())
-ax.set_extent(extent)
+ax.set_extent(extent1)
 ax.set_title("NT & OA Land With Railway Stations")
 pyguymer3.add_map_background(ax, resolution = "large4096px")
 ax.coastlines(resolution = "10m", color = "white", linewidth = 0.5)
 
 # Add grid lines manually ...
 for loc in range(math.ceil(xmin), math.floor(xmax) + 1):
-    xlocs, ylocs = funcs.calcVerticalGridlines(loc, extent)                     # [°], [°], [°], [°]
+    xlocs, ylocs = funcs.calcVerticalGridlines(loc, extent1)                    # [°], [°], [°], [°]
     ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
 for loc in range(math.ceil(ymin), math.floor(ymax) + 1):
-    xlocs, ylocs = funcs.calcHorizontalGridlines(loc, extent)                   # [°], [°], [°], [°]
+    xlocs, ylocs = funcs.calcHorizontalGridlines(loc, extent1)                  # [°], [°], [°], [°]
     ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
 
 # Plot railway stations ...
@@ -228,12 +232,19 @@ json.dump(
 
 # ******************************************************************************
 
+# Load tile metadata ...
+meta = json.load(open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt"))
+
+# Convert lists to arrays ...
+lats = numpy.array(lats)                                                        # [°]
+lons = numpy.array(lons)                                                        # [°]
+
 # Loop over radii (except the first one) ...
 for ir in range(1, radii.size):
     # Deduce key name ...
     key = f"{round(radii[ir]):,d}m"
 
-    print(f"Sumarising for a radius of {key} ...")
+    print(f"Summarising for a radius of {key} ...")
 
     # Initialize array ...
     areas = numpy.zeros(len(names), dtype = numpy.float64)                      # [m2]
@@ -243,18 +254,65 @@ for ir in range(1, radii.size):
         # Populate array ...
         areas[i] = data[name]["integrals"][key]                                 # [m2]
 
-    # Find the (reverse) sorted keys ...
-    keys = areas.argsort()[::-1]
-
-    # Find area of circle ...
+    # Find area of circle and convert areas to percentages ...
     area = numpy.pi * (radii[ir] ** 2)                                          # [m2]
+    percs = 100.0 * areas / area                                                # [%]
 
-    # Loop over Top 10 ...
-    for i in range(10):
-        # Calculate percentage open area ...
-        perc = 100.0 * areas[keys[i]] / area                                    # [%]
+    # **************************************************************************
 
-        print(f" > {names[keys[i]]:40s} : {perc:6.3f} %")
+    # Find the sorted keys ...
+    keys = percs.argsort()
+
+    # Create figure ...
+    fg = matplotlib.pyplot.figure(figsize = (9, 8), dpi = dpi)
+    ax = matplotlib.pyplot.axes(projection = cartopy.crs.Orthographic(central_longitude = midx, central_latitude = midy))
+    ax.set_extent(extent2)
+    ax.set_title("Railway Stations")
+
+    # Plot railway stations (layering them correctly) and add colour bar ...
+    sc = ax.scatter(
+        lons[keys],
+        lats[keys],
+        s = 10.0,
+        c = percs[keys],
+        linewidth = 0.1,
+        edgecolors = "black",
+        cmap = matplotlib.pyplot.cm.rainbow,
+        vmin = 0.0,
+        vmax = 70.0,
+        transform = cartopy.crs.PlateCarree()
+    )
+    cb = fg.colorbar(sc)
+    cb.set_label(f"NT & OA Land Within {key} [%]")
+
+    # Draw background image ...
+    ax.imshow(
+        matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),
+        cmap = "gray",
+        extent = meta["MiniScale_(mono)_R22"]["extent"],
+        interpolation = "bicubic",
+        origin = "upper",
+        transform = cartopy.crs.OSGB(),
+        vmin = 0.0,
+        vmax = 1.0
+    )
+
+    # Save figure ...
+    fg.savefig(f"howMuchLandv2_plot2_{key}.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+    if not debug:
+        pyguymer3.optimize_image(f"howMuchLandv2_plot2_{key}.png", strip = True)
+    matplotlib.pyplot.close(fg)
+
+    # **************************************************************************
+
+    # Reverse the sorted keys ...
+    keys = keys[::-1]
+
+    # Save the Top 25 ...
+    with open(f"howMuchLandv2_plot2_{key}.csv", "wt") as fobj:
+        fobj.write("name,area [m2],area [%]\n")
+        for i in range(25):
+            fobj.write(f"{names[keys[i]]},{areas[keys[i]]:e},{percs[keys[i]]:e}\n")
 
 # ******************************************************************************
 
