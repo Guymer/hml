@@ -30,7 +30,7 @@ except:
     raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 
 # Import my modules ...
-import funcs
+import f90
 try:
     import pyguymer3
 except:
@@ -224,16 +224,16 @@ for name in data:
         print(f" > {key} ...")
 
         # Find out how much open land there is within this circle ...
-        data[name]["integrals"][key] = funcs.sumImageWithinCircle(
-            grid,
-            0.0,
-            nx * px,
-            0.0,
-            ny * px,
-            radii[ir],
-            cx = data[name]["easting"],
-            cy = data[name]["northing"],
-            ndiv = ndiv
+        data[name]["integrals"][key] = f90.f90.sumimagewithincircle(
+            ndiv = ndiv,
+            xmin = 0.0,
+            xmax = float(nx * px),
+            ymin = 0.0,
+            ymax = float(ny * px),
+            r = radii[ir],
+            cx = float(data[name]["easting"]),
+            cy = float(data[name]["northing"]),
+            img = grid
         )                                                                       # [m2]
 
 # Save database ...
