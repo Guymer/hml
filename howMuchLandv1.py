@@ -37,6 +37,7 @@ except:
 
 # Import my modules ...
 import funcs
+import f90
 try:
     import pyguymer3
 except:
@@ -391,17 +392,17 @@ for lat, lon, title, stub in locs:
             fobj.write(
                 "{:e},{:e}\n".format(
                     radii[ir],
-                    funcs.sumImageWithinCircle(
-                        grid,
-                        0.0,
-                        nx * px,
-                        0.0,
-                        ny * px,
-                        radii[ir],
+                    f90.f90.sumimagewithincircle(
+                        ndiv = ndiv,
+                        xmin = 0.0,
+                        xmax = float(nx * px),
+                        ymin = 0.0,
+                        ymax = float(ny * px),
+                        r = radii[ir],
                         cx = x[0],
                         cy = y[0],
-                        ndiv = ndiv
-                    ),
+                        img = grid
+                    )
                 )
             )
 
