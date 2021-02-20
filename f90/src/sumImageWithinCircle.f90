@@ -29,8 +29,8 @@ PURE SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx
     REAL(kind = C_DOUBLE), DIMENSION(ny + 1, nx + 1)                            :: dist
 
     ! Calculate size of pixels ...
-    dx = (xmax - xmin) / REAL(ndiv, kind = C_DOUBLE)
-    dy = (ymax - ymin) / REAL(ndiv, kind = C_DOUBLE)
+    dx = (xmax - xmin) / REAL(nx, kind = C_DOUBLE)
+    dy = (ymax - ymin) / REAL(ny, kind = C_DOUBLE)
 
     ! Create nodes relative to the centre of the circle ...
     DO ix = 1_C_LONG_LONG, nx + 1_C_LONG_LONG
