@@ -24,8 +24,13 @@ try:
     import matplotlib.pyplot
 except:
     raise Exception("\"matplotlib\" is not installed; run \"pip install --user matplotlib\"") from None
+try:
+    import numpy
+except:
+    raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 
 # Import my modules ...
+import funcs
 try:
     import pyguymer3
 except:
@@ -50,6 +55,21 @@ def calc_vertical_gridlines(xloc, ext):
         x.append(xloc)                                                          # [°]
         y.append(yloc)                                                          # [°]
     return x, y
+
+# ******************************************************************************
+
+# Set resolution, pixel size, number of sub-divisions and extent of grid ...
+dpi = 300                                                                       # [px/in]
+px = 128                                                                        # [m]
+ndiv = 128                                                                      # [#]
+nx = 5200                                                                       # [#]
+ny = 5200                                                                       # [#]
+
+# Set mode and use it to override resolution and number of sub-divisions ...
+debug = False
+if debug:
+    dpi = 150                                                                   # [px/in]
+    ndiv = 16                                                                   # [#]
 
 # ******************************************************************************
 
@@ -141,7 +161,7 @@ extent = [xmin, xmax, ymin, ymax]                                               
 # ******************************************************************************
 
 # Create figure ...
-fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = 300)
+fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
 ax = matplotlib.pyplot.axes(projection = cartopy.crs.PlateCarree())
 ax.set_extent(extent)
 ax.set_title("NT & OA Land With Railway Stations")
@@ -173,9 +193,57 @@ ax.imshow(
 )
 
 # Save figure ...
-fg.savefig("howMuchLandv2_plot1.png", bbox_inches = "tight", dpi = 300, pad_inches = 0.1)
-pyguymer3.optimize_image("howMuchLandv2_plot1.png", strip = True)
+fg.savefig("howMuchLandv2_plot1.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+if not debug:
+    pyguymer3.optimize_image("howMuchLandv2_plot1.png", strip = True)
 matplotlib.pyplot.close(fg)
+
+# ******************************************************************************
+
+# Load grid ...
+grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))    # [m2]
+
+# Make radii ...
+radii = numpy.linspace(0.0, 50.0e3, num = 6)                                    # [m]
+
+# Loop over stations ...
+for name in data:
+    print(f"Integrating around \"{name}\" ...")
+
+    # Initialize dictionary ...
+    if "integrals" not in data[name]:
+        data[name]["integrals"] = {}
+
+    # Loop over radii (except the first one) ...
+    for ir in range(1, radii.size):
+        # Deduce key name and skip if it already exists ...
+        key = f"{round(radii[ir]):,d}m"
+        if key in data[name]["integrals"]:
+            continue
+
+        print(f" > {key} ...")
+
+        # Find out how much open land there is within this circle ...
+        data[name]["integrals"][key] = funcs.sumImageWithinCircle(
+            grid,
+            0.0,
+            nx * px,
+            0.0,
+            ny * px,
+            radii[ir],
+            cx = data[name]["easting"],
+            cy = data[name]["northing"],
+            ndiv = ndiv
+        )                                                                       # [m2]
+
+# Save database ...
+json.dump(
+    data,
+    open("howMuchLandv2.json", "wt"),
+    ensure_ascii = False,
+    indent = 4,
+    sort_keys = True
+)
 
 # ******************************************************************************
 
