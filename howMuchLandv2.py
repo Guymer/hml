@@ -150,7 +150,7 @@ fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
 ax = matplotlib.pyplot.axes(projection = cartopy.crs.PlateCarree())
 ax.set_extent(extent1)
 ax.set_title("NT & OA Land With Railway Stations")
-pyguymer3.add_map_background(ax, resolution = "large4096px")
+pyguymer3.geo.add_map_background(ax, resolution = "large4096px")
 ax.coastlines(resolution = "10m", color = "white", linewidth = 0.5)
 
 # Add grid lines manually ...
