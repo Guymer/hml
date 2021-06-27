@@ -35,6 +35,7 @@ import funcs
 try:
     import pyguymer3
     import pyguymer3.geo
+    import pyguymer3.image
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
 
@@ -181,7 +182,7 @@ ax.imshow(
 # Save figure ...
 fg.savefig("howMuchLandv2_plot1.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
 if not debug:
-    pyguymer3.optimize_image("howMuchLandv2_plot1.png", strip = True)
+    pyguymer3.image.optimize_image("howMuchLandv2_plot1.png", strip = True)
 matplotlib.pyplot.close(fg)
 
 # ******************************************************************************
@@ -301,7 +302,7 @@ for ir in range(1, radii.size):
     # Save figure ...
     fg.savefig(f"howMuchLandv2_plot2_{key}.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
     if not debug:
-        pyguymer3.optimize_image(f"howMuchLandv2_plot2_{key}.png", strip = True)
+        pyguymer3.image.optimize_image(f"howMuchLandv2_plot2_{key}.png", strip = True)
     matplotlib.pyplot.close(fg)
 
     # **************************************************************************

@@ -40,6 +40,7 @@ import f90
 import funcs
 try:
     import pyguymer3
+    import pyguymer3.image
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
 
@@ -291,7 +292,7 @@ for bname in sorted(glob.glob("*.bin")):
     grid *= 255.0                                                               # [colour level]
     numpy.place(grid, grid > 255.0, 255.0)                                      # [colour level]
     numpy.place(grid, grid <   0.0,   0.0)                                      # [colour level]
-    pyguymer3.save_array_as_image(grid, iname, ct = "rainbow")
+    pyguymer3.image.save_array_as_image(grid, iname, ct = "rainbow")
 
 # ******************************************************************************
 
@@ -357,7 +358,7 @@ for lat, lon, title, stub in locs:
     # Save figure ...
     fg.savefig(stub + ".png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
     if not debug:
-        pyguymer3.optimize_image(stub + ".png", strip = True)
+        pyguymer3.image.optimize_image(stub + ".png", strip = True)
     matplotlib.pyplot.close(fg)
 
     # Stop looping if debugging ...
@@ -431,7 +432,7 @@ ax.set_ylabel("Area [km2]")
 ax.set_ylim(0.0, 6.0e3)
 fg.savefig("howMuchLandv1_plot1.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
 if not debug:
-    pyguymer3.optimize_image("howMuchLandv1_plot1.png", strip = True)
+    pyguymer3.image.optimize_image("howMuchLandv1_plot1.png", strip = True)
 matplotlib.pyplot.close(fg)
 
 # ******************************************************************************
@@ -456,5 +457,5 @@ ax.set_ylabel("Area [%]")
 ax.set_ylim(0.0, 100.0)
 fg.savefig("howMuchLandv1_plot2.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
 if not debug:
-    pyguymer3.optimize_image("howMuchLandv1_plot2.png", strip = True)
+    pyguymer3.image.optimize_image("howMuchLandv1_plot2.png", strip = True)
 matplotlib.pyplot.close(fg)
