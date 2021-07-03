@@ -56,7 +56,7 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
         # Convert shapefile.Shape to shapely.geometry.polygon.Polygon or
         # shapely.geometry.multipolygon.MultiPolygon ...
         poly = shapely.geometry.shape(shapeRecord.shape)
-        if not poly.is_valid:
+        if not poly.is_valid or poly.is_empty:
             n += 1                                                              # [#]
             continue
 
