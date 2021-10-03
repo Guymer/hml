@@ -44,7 +44,7 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     globalGrid = numpy.zeros((ny, nx), dtype = numpy.float32)                   # [m2]
 
     # Create pool of workers and create empty list to hold the results ...
-    pool = multiprocessing.Pool(multiprocessing.cpu_count() - 1)
+    pool = multiprocessing.Pool()
     results = []
 
     # Loop over shape+record pairs ...
