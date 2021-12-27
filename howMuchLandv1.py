@@ -90,7 +90,8 @@ for i in range(cmap.N):
     cmap._lut[i, 3] = float(i) / float(cmap.N - 1)
 
 # Load tile metadata ...
-meta = json.load(open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt"))
+with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fobj:
+    meta = json.load(fobj)
 
 # ******************************************************************************
 
@@ -185,12 +186,12 @@ with zipfile.ZipFile("openAccess.zip", "r") as zfObj:
 print("The overall extent of the three datasets is:")
 print(f"    lower-left corner = ( {x1:,.1f}m , {y1:,.1f}m )")
 print(f"    upper-right corner = ( {x2:,.1f}m , {y2:,.1f}m )")
-print("    ∴ width = {:,.1f}m".format(x2 - x1))
-print("    ∴ height = {:,.1f}m".format(y2 - y1))
+print(f"    ∴ width = {x2 - x1:,.1f}m")
+print(f"    ∴ height = {y2 - y1:,.1f}m")
 print(f"I have chosen my pixels to be {px:,d}m x {px:,d}m as float32 values.")
-print("    ∴ nx needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(x2 / float(px)), nx))
-print("    ∴ ny needs to be >= {:,d} (I have chosen {:,d})".format(math.ceil(y2 / float(px)), ny))
-print("    ∴ each raster will be {:,.1f}MiB".format(nx * ny * 4.0 / (1024.0 * 1024.0)))
+print(f"    ∴ nx needs to be >= {math.ceil(x2 / float(px)):,d} (I have chosen {nx:,d})")
+print(f"    ∴ ny needs to be >= {math.ceil(y2 / float(px)):,d} (I have chosen {ny:,d})")
+print(f"    ∴ each raster will be {nx * ny * 4.0 / (1024.0 * 1024.0):,.1f}MiB")
 
 # ******************************************************************************
 
@@ -279,7 +280,7 @@ for bname in sorted(glob.glob("*.bin")):
     if os.path.exists(iname):
         continue
 
-    print("Making \"{:s}\" ...".format(iname))
+    print(f"Making \"{iname}\" ...")
 
     # Load BIN, flip it, scale it correctly and save as PNG ...
     # NOTE: The OSGB reference system has positive axes from an origin in the
@@ -316,7 +317,7 @@ for lat, lon, title, stub in locs:
     if os.path.exists(stub + ".png"):
         continue
 
-    print("Making \"{:s}.png\" ...".format(stub))
+    print(f"Making \"{stub}.png\" ...")
 
     # Define bounding box ...
     xmin, xmax, ymin, ymax = lon - fov, lon + fov, lat - fov, lat + fov         # [°], [°], [°], [°]
@@ -325,7 +326,7 @@ for lat, lon, title, stub in locs:
     fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
     ax = matplotlib.pyplot.axes(projection = cartopy.crs.PlateCarree())
     ax.set_extent([xmin, xmax, ymin, ymax])
-    ax.set_title("NT & OA Land Nearby ({:s})".format(title))
+    ax.set_title(f"NT & OA Land Nearby ({title})")
     if debug:
         ax.coastlines(resolution = "110m", color = "black", linewidth = 0.1)
     else:
@@ -376,13 +377,13 @@ for lat, lon, title, stub in locs:
     if os.path.exists(stub + ".csv"):
         continue
 
-    print("Making \"{:s}.csv\" ...".format(stub))
+    print(f"Making \"{stub}.csv\" ...")
 
     # Convert longitude/latitude to easting/northing ...
     x, y = convertbng.util.convert_bng(lon, lat)                                # [m], [m]
 
     # Open output file ...
-    with open(stub + ".csv", "wt") as fobj:
+    with open(f"{stub}.csv", "wt", encoding = "utf-8") as fobj:
         # Write header ...
         fobj.write("radius [m],open area [m2]\n")
 
@@ -399,10 +400,10 @@ for lat, lon, title, stub in locs:
                         xmax = float(nx * px),
                         ymin = 0.0,
                         ymax = float(ny * px),
-                        r = radii[ir],
-                        cx = x[0],
-                        cy = y[0],
-                        img = grid
+                           r = radii[ir],
+                          cx = x[0],
+                          cy = y[0],
+                         img = grid,
                     )
                 )
             )

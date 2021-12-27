@@ -73,7 +73,8 @@ sess.close()
 # Check if the JSON database exists ...
 if os.path.exists("howMuchLandv2.json"):
     # Load database ...
-    data = json.load(open("howMuchLandv2.json", "rt"))
+    with open("howMuchLandv2.json", "rt", encoding = "utf-8") as fobj:
+        data = json.load(fobj)
 
     # Initialize lists ...
     names = []
@@ -127,13 +128,14 @@ else:
         }
 
     # Save database ...
-    json.dump(
-        data,
-        open("howMuchLandv2.json", "wt"),
-        ensure_ascii = False,
-        indent = 4,
-        sort_keys = True
-    )
+    with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fobj:
+        json.dump(
+            data,
+            fobj,
+            ensure_ascii = False,
+                  indent = 4,
+               sort_keys = True,
+        )
 
 # ******************************************************************************
 
@@ -224,18 +226,20 @@ for name in names:
         )                                                                       # [m2]
 
 # Save database ...
-json.dump(
-    data,
-    open("howMuchLandv2.json", "wt"),
-    ensure_ascii = False,
-    indent = 4,
-    sort_keys = True
-)
+with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fobj:
+    json.dump(
+        data,
+        fobj,
+        ensure_ascii = False,
+              indent = 4,
+           sort_keys = True,
+    )
 
 # ******************************************************************************
 
 # Load tile metadata ...
-meta = json.load(open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt"))
+with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fobj:
+    meta = json.load(fobj)
 
 # Convert lists to arrays ...
 lats = numpy.array(lats)                                                        # [°]
@@ -311,7 +315,7 @@ for ir in range(1, radii.size):
     keys = keys[::-1]
 
     # Save the Top 25 ...
-    with open(f"howMuchLandv2_plot2_{key}.csv", "wt") as fobj:
+    with open(f"howMuchLandv2_plot2_{key}.csv", "wt", encoding = "utf-8") as fobj:
         fobj.write("name,area [m2],area [%]\n")
         for i in range(25):
             fobj.write(f"{names[keys[i]]},{areas[keys[i]]:e},{percs[keys[i]]:e}\n")
