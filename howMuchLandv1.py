@@ -276,7 +276,7 @@ if not os.path.exists("merged.bin"):
 # Loop over BINs ...
 for bname in sorted(glob.glob("*.bin")):
     # Deduce PNG name and skip this BIN if the PNG already exists ...
-    iname = bname[:-4] + ".png"
+    iname = f"{bname[:-4]}.png"
     if os.path.exists(iname):
         continue
 
@@ -314,7 +314,7 @@ grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))    
 # Loop over locations ...
 for lat, lon, title, stub in locs:
     # Skip this plot if it already exists ...
-    if os.path.exists(stub + ".png"):
+    if os.path.exists(f"{stub}.png"):
         continue
 
     print(f"Making \"{stub}.png\" ...")
@@ -334,14 +334,14 @@ for lat, lon, title, stub in locs:
 
     # Draw background image ...
     ax.imshow(
-        matplotlib.pyplot.imread("OrdnanceSurveyBackgroundImages/" + meta["MiniScale_(mono)_R22"]["greyscale"]),
-        cmap = "gray",
-        extent = meta["MiniScale_(relief1)_R22"]["extent"],
+        matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),
+                 cmap = "gray",
+               extent = meta["MiniScale_(relief1)_R22"]["extent"],
         interpolation = "bicubic",
-        origin = "upper",
-        transform = cartopy.crs.OSGB(),
-        vmin = 0.0,
-        vmax = 1.0
+               origin = "upper",
+            transform = cartopy.crs.OSGB(),
+                 vmin = 0.0,
+                 vmax = 1.0,
     )
 
     # Draw data ...
@@ -357,9 +357,9 @@ for lat, lon, title, stub in locs:
     )
 
     # Save figure ...
-    fg.savefig(stub + ".png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+    fg.savefig(f"{stub}.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
     if not debug:
-        pyguymer3.image.optimize_image(stub + ".png", strip = True)
+        pyguymer3.image.optimize_image(f"{stub}.png", strip = True)
     matplotlib.pyplot.close(fg)
 
     # Stop looping if debugging ...
@@ -374,7 +374,7 @@ radii = numpy.linspace(0.0, 100.0e3, num = nr)                                  
 # Loop over locations ...
 for lat, lon, title, stub in locs:
     # Skip this CSV if it already exists ...
-    if os.path.exists(stub + ".csv"):
+    if os.path.exists(f"{stub}.csv"):
         continue
 
     print(f"Making \"{stub}.csv\" ...")
@@ -417,7 +417,7 @@ ax = matplotlib.pyplot.subplot()
 # Loop over locations ...
 for lat, lon, title, stub in locs:
     # Plot data ...
-    x, y = numpy.loadtxt(stub + ".csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
+    x, y = numpy.loadtxt(f"{stub}.csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
     ax.plot(x / 1.0e3, y / 1.0e6, label = title)
 
 # Plot theoretical maximum ...
@@ -445,7 +445,7 @@ ax = matplotlib.pyplot.subplot()
 # Loop over locations ...
 for lat, lon, title, stub in locs:
     # Plot data ...
-    x, y = numpy.loadtxt(stub + ".csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
+    x, y = numpy.loadtxt(f"{stub}.csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
     ax.plot(x / 1.0e3, 100.0 * y / (numpy.pi * pow(x, 2)), label = title)
 
 # Save figure ...
