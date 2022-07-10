@@ -60,7 +60,7 @@ clean:		$(RM)
 	$(RM) -f *.mod *.o *.so
 
 # "gmake -r compile" = compiles the code
-compile:	f90.so
+compile:	funcs.so
 
 # "gmake -r help"    = print this help
 help:		$(GREP)																\
@@ -82,12 +82,12 @@ help:		$(GREP)																\
 #         * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90835
 #         * https://stackoverflow.com/a/58081934
 
-f90.cpython-39m-darwin.so:	$(FC1)												\
-							$(FC2)												\
-							f90.F90												\
-							src/*.f90
-	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -m f90 -lgomp f90.F90 -L$(LIBDIR)
+funcs.cpython-310-darwin.so:	$(FC1)											\
+								$(FC2)											\
+								funcs.F90										\
+								src/*.f90
+	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -m funcs -lgomp funcs.F90 -L$(LIBDIR)
 
-f90.so:						$(LN)												\
-							f90.cpython-39m-darwin.so
-	$(LN) -sf f90.cpython-39m-darwin.so f90.so
+funcs.so:						$(LN)											\
+								funcs.cpython-310-darwin.so
+	$(LN) -sf funcs.cpython-310-darwin.so funcs.so

@@ -36,8 +36,7 @@ except:
     raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
 
 # Import my modules ...
-import f90
-import funcs
+import hml
 try:
     import pyguymer3
     import pyguymer3.image
@@ -143,7 +142,7 @@ with zipfile.ZipFile("alwaysOpen.zip", "r") as zfObj:
     sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
     # Update extents ...
-    x1, y1, x2, y2 = funcs.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)# [m], [m], [m], [m]
+    x1, y1, x2, y2 = hml.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)  # [m], [m], [m], [m]
 
 # ******************************************************************************
 
@@ -161,7 +160,7 @@ with zipfile.ZipFile("limitedAccess.zip", "r") as zfObj:
     sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
     # Update extents ...
-    x1, y1, x2, y2 = funcs.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)# [m], [m], [m], [m]
+    x1, y1, x2, y2 = hml.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)  # [m], [m], [m], [m]
 
 # ******************************************************************************
 
@@ -179,7 +178,7 @@ with zipfile.ZipFile("openAccess.zip", "r") as zfObj:
     sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
     # Update extents ...
-    x1, y1, x2, y2 = funcs.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)# [m], [m], [m], [m]
+    x1, y1, x2, y2 = hml.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)  # [m], [m], [m], [m]
 
 # ******************************************************************************
 
@@ -211,7 +210,7 @@ if not os.path.exists("alwaysOpen.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
+        grid = hml.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
         grid.tofile("alwaysOpen.bin")
 
 # ******************************************************************************
@@ -232,7 +231,7 @@ if not os.path.exists("limitedAccess.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
+        grid = hml.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
         grid.tofile("limitedAccess.bin")
 
 # ******************************************************************************
@@ -253,7 +252,7 @@ if not os.path.exists("openAccess.bin"):
         sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
 
         # Rasterize and save to BIN ...
-        grid = funcs.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
+        grid = hml.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
         grid.tofile("openAccess.bin")
 
 # ******************************************************************************
@@ -394,7 +393,7 @@ for lat, lon, title, stub in locs:
             fobj.write(
                 "{:e},{:e}\n".format(
                     radii[ir],
-                    f90.f90.sumimagewithincircle(
+                    hml.f90.funcs.sumImageWithinCircle(
                         ndiv = ndiv,
                         xmin = 0.0,
                         xmax = float(nx * px),

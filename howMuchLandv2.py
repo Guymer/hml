@@ -30,8 +30,7 @@ except:
     raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
 
 # Import my modules ...
-import f90
-import funcs
+import hml
 try:
     import pyguymer3
     import pyguymer3.geo
@@ -159,10 +158,10 @@ ax.coastlines(resolution = "10m", color = "white", linewidth = 0.5)
 
 # Add grid lines manually ...
 for loc in range(math.ceil(xmin), math.floor(xmax) + 1):
-    xlocs, ylocs = funcs.calcVerticalGridlines(loc, extent1)                    # [°], [°], [°], [°]
+    xlocs, ylocs = hml.calcVerticalGridlines(loc, extent1)                      # [°], [°], [°], [°]
     ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
 for loc in range(math.ceil(ymin), math.floor(ymax) + 1):
-    xlocs, ylocs = funcs.calcHorizontalGridlines(loc, extent1)                  # [°], [°], [°], [°]
+    xlocs, ylocs = hml.calcHorizontalGridlines(loc, extent1)                    # [°], [°], [°], [°]
     ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
 
 # Plot railway stations ...
@@ -213,7 +212,7 @@ for name in names:
         print(f" > {key} ...")
 
         # Find out how much open land there is within this circle ...
-        data[name]["integrals"][key] = f90.f90.sumimagewithincircle(
+        data[name]["integrals"][key] = hml.f90.funcs.sumImageWithinCircle(
             ndiv = ndiv,
             xmin = 0.0,
             xmax = float(nx * px),

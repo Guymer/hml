@@ -1,4 +1,4 @@
-MODULE f90
+MODULE funcs
     IMPLICIT NONE
 
     CONTAINS
@@ -6,4 +6,4 @@ MODULE f90
     ! Include functions and subroutines ...
     INCLUDE "src/findFractionOfPixelWithinCircle.f90"
     INCLUDE "src/sumImageWithinCircle.f90"
-END MODULE f90
+END MODULE funcs

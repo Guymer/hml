@@ -4,4 +4,4 @@ called from Python using f2py.
 """
 
 # Import sub-functions ...
-from .f90 import f90
+from .funcs import *
