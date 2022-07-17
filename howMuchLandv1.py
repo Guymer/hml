@@ -323,7 +323,7 @@ for lat, lon, title, stub in locs:
 
     # Create figure ...
     fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
-    ax = matplotlib.pyplot.axes(projection = cartopy.crs.PlateCarree())
+    ax = fg.add_subplot(projection = cartopy.crs.PlateCarree())
     ax.set_extent([xmin, xmax, ymin, ymax])
     ax.set_title(f"NT & OA Land Nearby ({title})")
     if debug:

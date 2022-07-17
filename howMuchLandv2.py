@@ -150,7 +150,7 @@ extent2 = [midx - 3.75, midx + 3.75, midy - 2.5, midy + 2.5]                    
 
 # Create figure ...
 fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
-ax = matplotlib.pyplot.axes(projection = cartopy.crs.PlateCarree())
+ax = fg.add_subplot(projection = cartopy.crs.PlateCarree())
 ax.set_extent(extent1)
 ax.set_title("NT & OA Land With Railway Stations")
 pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
@@ -270,7 +270,7 @@ for ir in range(1, radii.size):
 
     # Create figure ...
     fg = matplotlib.pyplot.figure(figsize = (9, 8), dpi = dpi)
-    ax = matplotlib.pyplot.axes(projection = cartopy.crs.Orthographic(central_longitude = midx, central_latitude = midy))
+    ax = fg.add_subplot(projection = cartopy.crs.Orthographic(central_longitude = midx, central_latitude = midy))
     ax.set_extent(extent2)
     ax.set_title("Railway Stations")
 
