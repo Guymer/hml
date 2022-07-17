@@ -411,7 +411,7 @@ for lat, lon, title, stub in locs:
 
 # Create figure ...
 fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
-ax = matplotlib.pyplot.subplot()
+ax = fg.add_subplot()
 
 # Loop over locations ...
 for lat, lon, title, stub in locs:
@@ -439,7 +439,7 @@ matplotlib.pyplot.close(fg)
 
 # Create figure ...
 fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
-ax = matplotlib.pyplot.subplot()
+ax = fg.add_subplot()
 
 # Loop over locations ...
 for lat, lon, title, stub in locs:
