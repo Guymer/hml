@@ -82,12 +82,12 @@ help:		$(GREP)																\
 #         * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90835
 #         * https://stackoverflow.com/a/58081934
 
-funcs.cpython-310-darwin.so:	$(FC1)											\
+funcs.so:						$(FC1)											\
 								$(FC2)											\
+								$(LN)											\
+								$(RM)											\
 								funcs.F90										\
 								src/*.f90
+	$(RM) -f funcs.*.so funcs.so
 	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -m funcs -lgomp funcs.F90 -L$(LIBDIR)
-
-funcs.so:						$(LN)											\
-								funcs.cpython-310-darwin.so
-	$(LN) -sf funcs.cpython-310-darwin.so funcs.so
+	$(LN) -s funcs.*.so funcs.so
