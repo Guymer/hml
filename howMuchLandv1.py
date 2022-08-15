@@ -423,7 +423,7 @@ for lat, lon, title, stub in locs:
 ax.plot(radii / 1.0e3, numpy.pi * pow(radii, 2) / 1.0e6, label = "(theoretical maximum)", linestyle = ":")
 
 # Save figure ...
-ax.grid(True)
+ax.grid()
 ax.legend(fontsize = "small", loc = "upper left")
 ax.set_title("How much National Trust or Open Access land is nearby?")
 ax.set_xlabel("Radius [km]")
@@ -448,7 +448,7 @@ for lat, lon, title, stub in locs:
     ax.plot(x / 1.0e3, 100.0 * y / (numpy.pi * pow(x, 2)), label = title)
 
 # Save figure ...
-ax.grid(True)
+ax.grid()
 ax.legend(fontsize = "small", loc = "upper left")
 ax.set_title("How much National Trust or Open Access land is nearby?")
 ax.set_xlabel("Radius [km]")
