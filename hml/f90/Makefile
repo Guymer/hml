@@ -1,10 +1,11 @@
 # Find executables ...
-CUT  := $(shell which cut            2> /dev/null || echo "ERROR")
-FC1  := $(shell which f2py-3.10      2> /dev/null || echo "ERROR")
-FC2  := $(shell which gfortran-mp-12 2> /dev/null || echo "ERROR")
-GREP := $(shell which grep           2> /dev/null || echo "ERROR")
-LN   := $(shell which ln             2> /dev/null || echo "ERROR")
-RM   := $(shell which rm             2> /dev/null || echo "ERROR")
+CUT     := $(shell which cut            2> /dev/null || echo "ERROR")
+FC1     := $(shell which f2py-3.10      2> /dev/null || echo "ERROR")
+FC2     := $(shell which gfortran-mp-12 2> /dev/null || echo "ERROR")
+GREP    := $(shell which grep           2> /dev/null || echo "ERROR")
+LN      := $(shell which ln             2> /dev/null || echo "ERROR")
+PYTHON3 := $(shell which python3.10     2> /dev/null || echo "ERROR")
+RM      := $(shell which rm             2> /dev/null || echo "ERROR")
 
 # Set defaults ...
 DEBUG  ?= false
@@ -41,6 +42,9 @@ endif
 ifeq ($(LN),ERROR)
     $(error The binary "ln" is not installed)
 endif
+ifeq ($(PYTHON3),ERROR)
+    $(error The binary "python3" is not installed)
+endif
 ifeq ($(RM),ERROR)
     $(error The binary "rm" is not installed)
 endif
@@ -49,6 +53,9 @@ endif
 # ifneq ($(shell $(PYTHON3) -c "import numpy; print(0)" 2> /dev/null),0)
     # $(error The Python module "numpy" is not installed)
 # endif
+
+# Set variables ...
+SUFFIX ?= $(shell $(PYTHON3) -c "import sysconfig; print(sysconfig.get_config_var(\"EXT_SUFFIX\"))")
 
 # ******************************************************************************
 
@@ -65,6 +72,7 @@ compile:	funcs.so
 # "gmake -r help"    = print this help
 help:		$(GREP)																\
 			$(CUT)
+	echo "The suffix is \"${SUFFIX}\"."
 	echo "These are the available options:"
 	$(GREP) -E "^# \"gmake -r " Makefile | $(CUT) -c 2-
 
@@ -89,5 +97,5 @@ funcs.so:						$(FC1)											\
 								funcs.F90										\
 								src/*.f90
 	$(RM) -f funcs.*.so funcs.so
-	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -m funcs -lgomp funcs.F90 -L$(LIBDIR)
-	$(LN) -s funcs.*.so funcs.so
+	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -lgomp -m funcs funcs.F90 -L$(LIBDIR)
+	$(LN) -s funcs$(SUFFIX) funcs.so
