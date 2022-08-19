@@ -64,12 +64,16 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
             # Add rasterization job to worker pool ...
             results.append(pool.apply_async(rasterizePolygon, (poly,), {"px" : px}))
 
-        print("INFO: {:,d} records were skipped because they were invalid".format(n))
+        print(f"INFO: {n:,d} records were skipped because they were invalid")
 
         # Loop over results ...
         for result in results:
             # Get result ...
             ix1, iy1, localGrid = result.get()
+
+            # Check result ...
+            if not result.successful():
+                raise Exception("\"multiprocessing.pool.Pool.apply_async()\" was not successful") from None
 
             # Loop over x-axis ...
             for ix in range(localGrid.shape[1]):
