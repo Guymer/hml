@@ -44,7 +44,7 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
     globalGrid = numpy.zeros((ny, nx), dtype = numpy.float32)                   # [m2]
 
     # Create a pool of workers ...
-    with multiprocessing.Pool() as pool:
+    with multiprocessing.Pool(maxtasksperchild = 1) as pool:
         # Initialize list ...
         results = []
 
@@ -73,7 +73,7 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
 
             # Check result ...
             if not result.successful():
-                raise Exception("\"multiprocessing.pool.Pool.apply_async()\" was not successful") from None
+                raise Exception("\"multiprocessing.Pool().apply_async()\" was not successful") from None
 
             # Loop over x-axis ...
             for ix in range(localGrid.shape[1]):
