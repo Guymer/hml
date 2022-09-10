@@ -16,11 +16,6 @@ try:
 except:
     raise Exception("\"cartopy\" is not installed; run \"pip install --user Cartopy\"") from None
 try:
-    import convertbng
-    import convertbng.util
-except:
-    raise Exception("\"convertbng\" is not installed; run \"pip install --user convertbng\"") from None
-try:
     import matplotlib
     matplotlib.use("Agg")                                                       # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
     import matplotlib.pyplot
@@ -37,8 +32,10 @@ except:
 
 # Import my modules ...
 import hml
+import hml.f90
 try:
     import pyguymer3
+    import pyguymer3.geo
     import pyguymer3.image
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
@@ -188,8 +185,8 @@ print(f"    upper-right corner = ( {x2:,.1f}m , {y2:,.1f}m )")
 print(f"    ∴ width = {x2 - x1:,.1f}m")
 print(f"    ∴ height = {y2 - y1:,.1f}m")
 print(f"I have chosen my pixels to be {px:,d}m x {px:,d}m as float32 values.")
-print(f"    ∴ nx needs to be >= {math.ceil(x2 / float(px)):,d} (I have chosen {nx:,d})")
-print(f"    ∴ ny needs to be >= {math.ceil(y2 / float(px)):,d} (I have chosen {ny:,d})")
+print(f"    ∴ nx needs to be ≥ {math.ceil(x2 / float(px)):,d} (I have chosen {nx:,d})")
+print(f"    ∴ ny needs to be ≥ {math.ceil(y2 / float(px)):,d} (I have chosen {ny:,d})")
 print(f"    ∴ each raster will be {nx * ny * 4.0 / (1024.0 * 1024.0):,.1f}MiB")
 
 # ******************************************************************************
@@ -346,13 +343,13 @@ for lat, lon, title, stub in locs:
     # Draw data ...
     ax.imshow(
         grid,
-        cmap = cmap,
-        extent = [0.0, nx * px, 0.0, ny * px],
+                 cmap = cmap,
+               extent = [0.0, nx * px, 0.0, ny * px],
         interpolation = "bicubic",
-        origin = "lower",
-        transform = cartopy.crs.OSGB(),
-        vmin = 0.0,
-        vmax = float(px * px)
+               origin = "lower",
+            transform = cartopy.crs.OSGB(),
+                 vmax = float(px * px),
+                 vmin = 0.0,
     )
 
     # Save figure ...
@@ -379,7 +376,7 @@ for lat, lon, title, stub in locs:
     print(f"Making \"{stub}.csv\" ...")
 
     # Convert longitude/latitude to easting/northing ...
-    x, y = convertbng.util.convert_bng(lon, lat)                                # [m], [m]
+    east, north = pyguymer3.geo._ll2en(lon, lat)                                # [m], [m]
 
     # Open output file ...
     with open(f"{stub}.csv", "wt", encoding = "utf-8") as fobj:
@@ -388,24 +385,21 @@ for lat, lon, title, stub in locs:
 
         # Loop over radii (except the first one) ...
         for ir in range(1, nr):
-            # Find out how much open land there is within this circle and save
-            # it to the CSV ...
-            fobj.write(
-                "{:e},{:e}\n".format(
-                    radii[ir],
-                    hml.f90.funcs.sumImageWithinCircle(
-                        ndiv = ndiv,
-                        xmin = 0.0,
-                        xmax = float(nx * px),
-                        ymin = 0.0,
-                        ymax = float(ny * px),
-                           r = radii[ir],
-                          cx = x[0],
-                          cy = y[0],
-                         img = grid,
-                    )
-                )
+            # Find out how much open land there is within this circle ...
+            tot = hml.f90.funcs.sumimagewithincircle(
+                ndiv = ndiv,
+                xmin = 0.0,
+                xmax = float(nx * px),
+                ymin = 0.0,
+                ymax = float(ny * px),
+                   r = radii[ir],
+                  cx = east,
+                  cy = north,
+                 img = grid,
             )
+
+            # Save total to the CSV ...
+            fobj.write(f"{radii[ir]:.15e},{tot:.15e}\n")
 
 # ******************************************************************************
 

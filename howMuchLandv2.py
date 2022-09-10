@@ -14,11 +14,6 @@ try:
 except:
     raise Exception("\"cartopy\" is not installed; run \"pip install --user Cartopy\"") from None
 try:
-    import convertbng
-    import convertbng.util
-except:
-    raise Exception("\"convertbng\" is not installed; run \"pip install --user convertbng\"") from None
-try:
     import matplotlib
     matplotlib.use("Agg")                                                       # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
     import matplotlib.pyplot
@@ -31,6 +26,7 @@ except:
 
 # Import my modules ...
 import hml
+import hml.f90
 try:
     import pyguymer3
     import pyguymer3.geo
@@ -94,12 +90,14 @@ else:
     names = []
     easts = []                                                                  # [m]
     norths = []                                                                 # [m]
+    lons = []                                                                   # [°]
+    lats = []                                                                   # [°]
 
     # Load dataset ...
     with zipfile.ZipFile("NaPTANcsv.zip", "r") as zfObj:
         # Load CSV file into RAM as a UTF-8 string and remove erroneous NULL
         # bytes ...
-        csvSrc = zfObj.read("StopAreas.csv").decode("utf-8").replace("\x00", "")
+        csvSrc = zfObj.read("StopAreas.csv").decode("utf-8").replace("\x00", " ").strip()
 
         # Loop over rows ...
         for row in csv.DictReader(csvSrc.splitlines()):
@@ -113,8 +111,10 @@ else:
             easts.append(int(row["Easting"]))                                   # [m]
             norths.append(int(row["Northing"]))                                 # [m]
 
-    # Convert eastings and northings to longitudes and latitudes ...
-    lons, lats = convertbng.util.convert_lonlat(easts, norths)                  # [°], [°]
+            # Append longitude and latitude to lists ...
+            lon, lat = pyguymer3.geo._en2ll(int(row["Easting"]), int(row["Northing"]))  # [°], [°]
+            lons.append(lon)                                                    # [°]
+            lats.append(lat)                                                    # [°]
 
     # Merge lists in to a dictionary ...
     data = {}
@@ -138,34 +138,74 @@ else:
 
 # ******************************************************************************
 
+# Convert lists to arrays ...
+lons = numpy.array(lons)                                                        # [°]
+lats = numpy.array(lats)                                                        # [°]
+
 # Define bounding box (for the first plot) ...
 xmin, xmax, ymin, ymax = -8.5, 2.5, 49.5, 56.0                                  # [°], [°], [°], [°]
-extent1 = [xmin, xmax, ymin, ymax]                                              # [°], [°], [°], [°]
+extent1 = [xmin, xmax, ymin, ymax]                                              # [°]
 
 # Define bounding box (for the second plots) ...
 midx, midy = -2.0, 52.5                                                         # [°], [°]
-extent2 = [midx - 3.75, midx + 3.75, midy - 2.5, midy + 2.5]                    # [°], [°], [°], [°]
+extent2 = [midx - 3.75, midx + 3.75, midy - 2.5, midy + 2.5]                    # [°]
 
 # ******************************************************************************
 
 # Create figure ...
-fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
-ax = fg.add_subplot(projection = cartopy.crs.PlateCarree())
+fg = matplotlib.pyplot.figure(
+        dpi = dpi,
+    figsize = (9, 9),
+)
+
+# Create axis ...
+ax = fg.add_subplot(
+    projection = cartopy.crs.Orthographic(
+        central_longitude = 0.5 * (xmin + xmax),
+         central_latitude = 0.5 * (ymin + ymax),
+    ),
+)
+
+# Configure axis ...
+ax.coastlines(
+         color = "white",
+     linewidth = 0.5,
+    resolution = "10m",
+)
 ax.set_extent(extent1)
 ax.set_title("NT & OA Land With Railway Stations")
 pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
-ax.coastlines(resolution = "10m", color = "white", linewidth = 0.5)
 
 # Add grid lines manually ...
 for loc in range(math.ceil(xmin), math.floor(xmax) + 1):
-    xlocs, ylocs = hml.calcVerticalGridlines(loc, extent1)                      # [°], [°], [°], [°]
-    ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
+    xlocs, ylocs = hml.calcVerticalGridlines(loc, extent1)                      # [°], [°]
+    ax.plot(
+        xlocs,
+        ylocs,
+            color = "white",
+        linestyle = ":",
+        linewidth = 0.5,
+        transform = cartopy.crs.PlateCarree(),
+    )
 for loc in range(math.ceil(ymin), math.floor(ymax) + 1):
-    xlocs, ylocs = hml.calcHorizontalGridlines(loc, extent1)                    # [°], [°], [°], [°]
-    ax.plot(xlocs, ylocs, transform = cartopy.crs.PlateCarree(), color = "white", linewidth = 0.5, linestyle = ":")
+    xlocs, ylocs = hml.calcHorizontalGridlines(loc, extent1)                    # [°], [°]
+    ax.plot(
+        xlocs,
+        ylocs,
+            color = "white",
+        linestyle = ":",
+        linewidth = 0.5,
+        transform = cartopy.crs.PlateCarree(),
+    )
 
 # Plot railway stations ...
-ax.scatter(lons, lats, s = 1.0, transform = cartopy.crs.PlateCarree(), color = "cyan", marker = "o")
+ax.scatter(
+    lons,
+    lats,
+        color = "cyan",
+            s = 10.0,
+    transform = cartopy.crs.PlateCarree(),
+)
 
 # Draw background image ...
 # NOTE: "merged.png" is an indexed PNG and for some reason it is loaded with an
@@ -174,17 +214,25 @@ ax.scatter(lons, lats, s = 1.0, transform = cartopy.crs.PlateCarree(), color = "
 #       channels.
 ax.imshow(
     matplotlib.pyplot.imread("merged.png")[:, :, :3],
-    extent = [0.0, 128.0 * 5200.0, 0.0, 128.0 * 5200.0],
+           extent = [0.0, 128.0 * 5200.0, 0.0, 128.0 * 5200.0],
     interpolation = "bicubic",
-    origin = "upper",
-    transform = cartopy.crs.OSGB()
+           origin = "upper",
+        transform = cartopy.crs.OSGB(),
 )
 
+# Configure figure ...
+fg.tight_layout()
+
 # Save figure ...
-fg.savefig("howMuchLandv2_plot1.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
-if not debug:
-    pyguymer3.image.optimize_image("howMuchLandv2_plot1.png", strip = True)
+fg.savefig(
+    "howMuchLandv2_plot1.png",
+           dpi = dpi,
+    pad_inches = 0.1,
+)
 matplotlib.pyplot.close(fg)
+
+# Optimize PNG ...
+pyguymer3.image.optimize_image("howMuchLandv2_plot1.png", strip = True)
 
 # ******************************************************************************
 
@@ -212,16 +260,16 @@ for name in names:
         print(f" > {key} ...")
 
         # Find out how much open land there is within this circle ...
-        data[name]["integrals"][key] = hml.f90.funcs.sumImageWithinCircle(
+        data[name]["integrals"][key] = hml.f90.funcs.sumimagewithincircle(
+              cx = float(data[name]["easting"]),
+              cy = float(data[name]["northing"]),
+             img = grid,
             ndiv = ndiv,
-            xmin = 0.0,
+               r = radii[ir],
             xmax = float(nx * px),
-            ymin = 0.0,
+            xmin = 0.0,
             ymax = float(ny * px),
-            r = radii[ir],
-            cx = float(data[name]["easting"]),
-            cy = float(data[name]["northing"]),
-            img = grid
+            ymin = 0.0,
         )                                                                       # [m2]
 
 # Save database ...
@@ -239,10 +287,6 @@ with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fobj:
 # Load tile metadata ...
 with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fobj:
     meta = json.load(fobj)
-
-# Convert lists to arrays ...
-lats = numpy.array(lats)                                                        # [°]
-lons = numpy.array(lons)                                                        # [°]
 
 # Loop over radii (except the first one) ...
 for ir in range(1, radii.size):
@@ -269,8 +313,20 @@ for ir in range(1, radii.size):
     keys = percs.argsort()
 
     # Create figure ...
-    fg = matplotlib.pyplot.figure(figsize = (9, 8), dpi = dpi)
-    ax = fg.add_subplot(projection = cartopy.crs.Orthographic(central_longitude = midx, central_latitude = midy))
+    fg = matplotlib.pyplot.figure(
+            dpi = dpi,
+        figsize = (9, 9),
+    )
+
+    # Create axis ...
+    ax = fg.add_subplot(
+        projection = cartopy.crs.Orthographic(
+            central_longitude = midx,
+             central_latitude = midy,
+        ),
+    )
+
+    # Configure axis ...
     ax.set_extent(extent2)
     ax.set_title("Railway Stations")
 
@@ -278,14 +334,14 @@ for ir in range(1, radii.size):
     sc = ax.scatter(
         lons[keys],
         lats[keys],
-        s = 10.0,
-        c = percs[keys],
-        linewidth = 0.1,
+                 c = percs[keys],
+              cmap = matplotlib.pyplot.cm.rainbow,
         edgecolors = "black",
-        cmap = matplotlib.pyplot.cm.rainbow,
-        vmin = 0.0,
-        vmax = 70.0,
-        transform = cartopy.crs.PlateCarree()
+         linewidth = 0.1,
+                 s = 10.0,
+         transform = cartopy.crs.PlateCarree(),
+              vmax = 70.0,
+              vmin = 0.0,
     )
     cb = fg.colorbar(sc)
     cb.set_label(f"NT & OA Land Within {key} [%]")
@@ -293,20 +349,28 @@ for ir in range(1, radii.size):
     # Draw background image ...
     ax.imshow(
         matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),
-        cmap = "gray",
-        extent = meta["MiniScale_(mono)_R22"]["extent"],
+                 cmap = "gray",
+               extent = meta["MiniScale_(mono)_R22"]["extent"],
         interpolation = "bicubic",
-        origin = "upper",
-        transform = cartopy.crs.OSGB(),
-        vmin = 0.0,
-        vmax = 1.0
+               origin = "upper",
+            transform = cartopy.crs.OSGB(),
+                 vmax = 1.0,
+                 vmin = 0.0,
     )
 
+    # Configure figure ...
+    fg.tight_layout()
+
     # Save figure ...
-    fg.savefig(f"howMuchLandv2_plot2_{key}.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
-    if not debug:
-        pyguymer3.image.optimize_image(f"howMuchLandv2_plot2_{key}.png", strip = True)
+    fg.savefig(
+        f"howMuchLandv2_plot2_{key}.png",
+               dpi = dpi,
+        pad_inches = 0.1,
+    )
     matplotlib.pyplot.close(fg)
+
+    # Optimize PNG ...
+    pyguymer3.image.optimize_image(f"howMuchLandv2_plot2_{key}.png", strip = True)
 
     # **************************************************************************
 
