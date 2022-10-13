@@ -29,6 +29,7 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
         raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
     try:
         import shapely
+        import shapely.validation
     except:
         raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
 
@@ -57,7 +58,11 @@ def rasterizeShapefile(sfObj, px = 1024.0, nx = 1024, ny = 1024):
             # Convert shapefile.Shape to shapely.geometry.polygon.Polygon or
             # shapely.geometry.multipolygon.MultiPolygon ...
             poly = shapely.geometry.shape(shapeRecord.shape)
-            if not poly.is_valid or poly.is_empty:
+            if not poly.is_valid:
+                print(f"WARNING: Skipping a shape as it is not valid ({shapely.validation.explain_validity(poly)}).")
+                n += 1                                                          # [#]
+                continue
+            if poly.is_empty:
                 n += 1                                                          # [#]
                 continue
 
