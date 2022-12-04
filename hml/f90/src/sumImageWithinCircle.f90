@@ -110,9 +110,9 @@ SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx, cy,
                             xmax = xaxis(ix + 1_C_LONG_LONG),                   &
                             ymin = yaxis(iy),                                   &
                             ymax = yaxis(iy + 1_C_LONG_LONG),                   &
-                            r = r,                                              &
-                            cx = 0.0e0_C_DOUBLE,                                &
-                            cy = 0.0e0_C_DOUBLE,                                &
+                               r = r,                                           &
+                              cx = 0.0e0_C_DOUBLE,                              &
+                              cy = 0.0e0_C_DOUBLE,                              &
                             frac = frac                                         &
                         )
                         tot = tot + img(iy, ix) * frac
