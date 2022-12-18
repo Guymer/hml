@@ -1,4 +1,4 @@
-def sumImageWithinCircle(img, xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.0, ndiv = 16):
+def sumImageWithinCircle(img, xmin, xmax, ymin, ymax, r, kwArgCheck = None, cx = 0.0, cy = 0.0, ndiv = 16):
     """
     Sum the pixel values on an image that are within a hard circular mask.
 
@@ -27,6 +27,10 @@ def sumImageWithinCircle(img, xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.0, ndi
 
     # Import sub-functions ...
     from .findFractionOfPixelWithinCircle import findFractionOfPixelWithinCircle
+
+    # Check keyword arguments ...
+    if kwArgCheck is not None:
+        print(f"WARNING: \"{__name__}\" has been called with an extra positional argument")
 
     # Create nodes relative to the centre of the circle ...
     xaxis = numpy.linspace(xmin, xmax, num = img.shape[1] + 1) - cx
@@ -60,7 +64,16 @@ def sumImageWithinCircle(img, xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.0, ndi
                 tot += img[iy, ix]
             else:
                 # Add part of the value to total ...
-                tot += img[iy, ix] * findFractionOfPixelWithinCircle(xaxis[ix], xaxis[ix + 1], yaxis[iy], yaxis[iy + 1], r, ndiv = ndiv)
+                tot += img[iy, ix] * findFractionOfPixelWithinCircle(
+                    xaxis[ix],
+                    xaxis[ix + 1],
+                    yaxis[iy],
+                    yaxis[iy + 1],
+                    r,
+                      cx = 0.0,
+                      cy = 0.0,
+                    ndiv = ndiv,
+                )
 
     # Return answer ...
     return tot

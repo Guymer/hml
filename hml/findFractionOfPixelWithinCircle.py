@@ -1,4 +1,4 @@
-def findFractionOfPixelWithinCircle(xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.0, ndiv = 16):
+def findFractionOfPixelWithinCircle(xmin, xmax, ymin, ymax, r, kwArgCheck = None, cx = 0.0, cy = 0.0, ndiv = 16):
     """
     Find the fraction of a pixel that is within a hard circular mask.
 
@@ -23,6 +23,10 @@ def findFractionOfPixelWithinCircle(xmin, xmax, ymin, ymax, r, cx = 0.0, cy = 0.
         import numpy
     except:
         raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
+
+    # Check keyword arguments ...
+    if kwArgCheck is not None:
+        print(f"WARNING: \"{__name__}\" has been called with an extra positional argument")
 
     # Create nodes relative to the centre of the circle ...
     xaxis = numpy.linspace(xmin, xmax, num = ndiv + 1) - cx
