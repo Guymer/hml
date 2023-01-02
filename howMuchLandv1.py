@@ -87,8 +87,8 @@ for i in range(cmap.N):
     cmap._lut[i, 3] = float(i) / float(cmap.N - 1)
 
 # Load tile metadata ...
-with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fobj:
-    meta = json.load(fobj)
+with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fObj:
+    meta = json.load(fObj)
 
 # ******************************************************************************
 
@@ -380,9 +380,9 @@ for lat, lon, title, stub in locs:
     east, north = pyguymer3.geo._ll2en(lon, lat)                                # [m], [m]
 
     # Open output file ...
-    with open(f"{stub}.csv", "wt", encoding = "utf-8") as fobj:
+    with open(f"{stub}.csv", "wt", encoding = "utf-8") as fObj:
         # Write header ...
-        fobj.write("radius [m],open area [m2]\n")
+        fObj.write("radius [m],open area [m2]\n")
 
         # Loop over radii (except the first one) ...
         for ir in range(1, nr):
@@ -400,7 +400,7 @@ for lat, lon, title, stub in locs:
             )
 
             # Save total to the CSV ...
-            fobj.write(f"{radii[ir]:.15e},{tot:.15e}\n")
+            fObj.write(f"{radii[ir]:.15e},{tot:.15e}\n")
 
 # ******************************************************************************
 

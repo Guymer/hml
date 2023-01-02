@@ -69,8 +69,8 @@ sess.close()
 # Check if the JSON database exists ...
 if os.path.exists("howMuchLandv2.json"):
     # Load database ...
-    with open("howMuchLandv2.json", "rt", encoding = "utf-8") as fobj:
-        data = json.load(fobj)
+    with open("howMuchLandv2.json", "rt", encoding = "utf-8") as fObj:
+        data = json.load(fObj)
 
     # Initialize lists ...
     names = []
@@ -128,10 +128,10 @@ else:
         }
 
     # Save database ...
-    with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fobj:
+    with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fObj:
         json.dump(
             data,
-            fobj,
+            fObj,
             ensure_ascii = False,
                   indent = 4,
                sort_keys = True,
@@ -274,10 +274,10 @@ for name in names:
         )                                                                       # [m2]
 
 # Save database ...
-with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fobj:
+with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fObj:
     json.dump(
         data,
-        fobj,
+        fObj,
         ensure_ascii = False,
               indent = 4,
            sort_keys = True,
@@ -286,8 +286,8 @@ with open("howMuchLandv2.json", "wt", encoding = "utf-8") as fobj:
 # ******************************************************************************
 
 # Load tile metadata ...
-with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fobj:
-    meta = json.load(fobj)
+with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fObj:
+    meta = json.load(fObj)
 
 # Loop over radii (except the first one) ...
 for ir in range(1, radii.size):
@@ -379,7 +379,7 @@ for ir in range(1, radii.size):
     keys = keys[::-1]
 
     # Save the Top 25 ...
-    with open(f"howMuchLandv2_plot2_{key}.csv", "wt", encoding = "utf-8") as fobj:
-        fobj.write("name,area [m2],area [%]\n")
+    with open(f"howMuchLandv2_plot2_{key}.csv", "wt", encoding = "utf-8") as fObj:
+        fObj.write("name,area [m2],area [%]\n")
         for i in range(25):
-            fobj.write(f"{names[keys[i]]},{areas[keys[i]]:e},{percs[keys[i]]:e}\n")
+            fObj.write(f"{names[keys[i]]},{areas[keys[i]]:e},{percs[keys[i]]:e}\n")
