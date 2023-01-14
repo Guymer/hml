@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+# Define function ...
 def calcHorizontalGridlines(yloc, ext):
     x = []                                                                      # [°]
     y = []                                                                      # [°]

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+# Define function ...
 def findFractionOfPixelWithinCircle(xmin, xmax, ymin, ymax, r, kwArgCheck = None, cx = 0.0, cy = 0.0, ndiv = 16):
     """
     Find the fraction of a pixel that is within a hard circular mask.

@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+# Define function ...
 def rasterizePolygon(poly, kwArgCheck = None, px = 1024.0):
     """
     Rasterize a [Multi]Polygon.

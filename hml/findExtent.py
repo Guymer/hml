@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+# Define function ...
 def findExtent(sfObj, kwArgCheck = None, x1 = 1.0e10, x2 = 0.0, y1 = 1.0e10, y2 = 0.0):
     """
     Update the supplied bounding box so that it encompasses the overall bounding
