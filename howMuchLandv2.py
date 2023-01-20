@@ -53,16 +53,12 @@ if debug:
 # ******************************************************************************
 
 # Start session ...
-sess = pyguymer3.start_session()
-
-# Download dataset if it is missing ...
-fname = "NaPTANcsv.zip"
-if not os.path.exists(fname):
-    url = "https://naptan.app.dft.gov.uk/DataRequest/Naptan.ashx?format=csv"
-    pyguymer3.download_file(sess, url, fname)
-
-# Close session ...
-sess.close()
+with pyguymer3.start_session() as sess:
+    # Download dataset if it is missing ...
+    fname = "NaPTANcsv.zip"
+    if not os.path.exists(fname):
+        url = "https://naptan.app.dft.gov.uk/DataRequest/Naptan.ashx?format=csv"
+        pyguymer3.download_file(sess, url, fname)
 
 # ******************************************************************************
 
