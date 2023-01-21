@@ -15,9 +15,14 @@ except:
     raise Exception("\"cartopy\" is not installed; run \"pip install --user Cartopy\"") from None
 try:
     import matplotlib
-    matplotlib.use("Agg")                                                       # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
+    matplotlib.rcParams.update(
+        {
+               "backend" : "Agg",                                               # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
+            "figure.dpi" : 300,
+             "font.size" : 8,
+        }
+    )
     import matplotlib.pyplot
-    matplotlib.pyplot.rcParams.update({"font.size" : 8})
 except:
     raise Exception("\"matplotlib\" is not installed; run \"pip install --user matplotlib\"") from None
 try:
@@ -37,17 +42,15 @@ except:
 
 # ******************************************************************************
 
-# Set resolution, pixel size, number of sub-divisions and extent of grid ...
-dpi = 300                                                                       # [px/in]
+# Set pixel size, number of sub-divisions and extent of grid ...
 px = 128                                                                        # [m]
 ndiv = 128                                                                      # [#]
 nx = 5200                                                                       # [#]
 ny = 5200                                                                       # [#]
 
-# Set mode and use it to override resolution and number of sub-divisions ...
+# Set mode and use it to override number of sub-divisions ...
 debug = False
 if debug:
-    dpi = 150                                                                   # [px/in]
     ndiv = 16                                                                   # [#]
 
 # ******************************************************************************
@@ -150,10 +153,7 @@ extent2 = [midx - 3.75, midx + 3.75, midy - 2.5, midy + 2.5]                    
 # ******************************************************************************
 
 # Create figure ...
-fg = matplotlib.pyplot.figure(
-        dpi = dpi,
-    figsize = (9, 9),
-)
+fg = matplotlib.pyplot.figure(figsize = (9, 9))
 
 # Create axis ...
 ax = fg.add_subplot(
@@ -221,11 +221,7 @@ ax.imshow(
 fg.tight_layout()
 
 # Save figure ...
-fg.savefig(
-    "howMuchLandv2_plot1.png",
-           dpi = dpi,
-    pad_inches = 0.1,
-)
+fg.savefig("howMuchLandv2_plot1.png")
 matplotlib.pyplot.close(fg)
 
 # Optimize PNG ...
@@ -310,10 +306,7 @@ for ir in range(1, radii.size):
     keys = percs.argsort()
 
     # Create figure ...
-    fg = matplotlib.pyplot.figure(
-            dpi = dpi,
-        figsize = (9, 9),
-    )
+    fg = matplotlib.pyplot.figure(figsize = (9, 9))
 
     # Create axis ...
     ax = fg.add_subplot(
@@ -327,7 +320,7 @@ for ir in range(1, radii.size):
     ax.set_extent(extent2)
     ax.set_title("Railway Stations")
 
-    # Plot railway stations (layering them correctly) and add colour bar ...
+    # Plot railway stations (layering them correctly) ...
     sc = ax.scatter(
         lons[keys],
         lats[keys],
@@ -340,7 +333,11 @@ for ir in range(1, radii.size):
               vmax = 70.0,
               vmin = 0.0,
     )
+
+    # Add colour bar ...
     cb = fg.colorbar(sc)
+
+    # Configure colour bar ...
     cb.set_label(f"NT & OA Land Within {key} [%]")
 
     # Draw background image ...
@@ -359,11 +356,7 @@ for ir in range(1, radii.size):
     fg.tight_layout()
 
     # Save figure ...
-    fg.savefig(
-        f"howMuchLandv2_plot2_{key}.png",
-               dpi = dpi,
-        pad_inches = 0.1,
-    )
+    fg.savefig(f"howMuchLandv2_plot2_{key}.png")
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...

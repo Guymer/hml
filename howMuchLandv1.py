@@ -17,9 +17,14 @@ except:
     raise Exception("\"cartopy\" is not installed; run \"pip install --user Cartopy\"") from None
 try:
     import matplotlib
-    matplotlib.use("Agg")                                                       # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
+    matplotlib.rcParams.update(
+        {
+               "backend" : "Agg",                                               # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
+            "figure.dpi" : 300,
+             "font.size" : 8,
+        }
+    )
     import matplotlib.pyplot
-    matplotlib.pyplot.rcParams.update({"font.size" : 8})
 except:
     raise Exception("\"matplotlib\" is not installed; run \"pip install --user matplotlib\"") from None
 try:
@@ -49,24 +54,20 @@ except:
 #         * https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid
 #         * https://commons.wikimedia.org/wiki/File:Ordnance_Survey_National_Grid.svg
 
-# Set resolution, pixel size, number of sub-divisions, number of radii and
-# extent of grid ...
-dpi = 300                                                                       # [px/in]
+# Set pixel size, number of sub-divisions, number of radii and extent of grid ...
 px = 128                                                                        # [m]
 ndiv = 128                                                                      # [#]
 nr = 128                                                                        # [#]
 nx = 5200                                                                       # [#]
 ny = 5200                                                                       # [#]
 
-# Set field-of-view and padding ...
+# Set field-of-view ...
 fov = 0.5                                                                       # [°]
-pad = 0.1                                                                       # [°]
 
-# Set mode and use it to override resolution, pixel size, number of
-# sub-divisions, number of radii and extent of grid ...
+# Set mode and use it to override pixel size, number of sub-divisions, number of
+# radii and extent of grid ...
 debug = False
 if debug:
-    dpi = 150                                                                   # [px/in]
     px = 1024                                                                   # [m]
     ndiv = 16                                                                   # [#]
     nr = 16                                                                     # [#]
@@ -316,8 +317,12 @@ for lat, lon, title, stub in locs:
     xmin, xmax, ymin, ymax = lon - fov, lon + fov, lat - fov, lat + fov         # [°], [°], [°], [°]
 
     # Create figure ...
-    fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
+    fg = matplotlib.pyplot.figure(figsize = (9, 6))
+
+    # Create axis ...
     ax = fg.add_subplot(projection = cartopy.crs.PlateCarree())
+
+    # Configure axis ...
     ax.set_extent([xmin, xmax, ymin, ymax])
     ax.set_title(f"NT & OA Land Nearby ({title})")
     if debug:
@@ -349,11 +354,16 @@ for lat, lon, title, stub in locs:
                  vmin = 0.0,
     )
 
+    # Configure figure ...
+    fg.tight_layout()
+
     # Save figure ...
-    fg.savefig(f"{stub}.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+    fg.savefig(f"{stub}.png")
+    matplotlib.pyplot.close(fg)
+
+    # Optimize PNG ...
     if not debug:
         pyguymer3.image.optimize_image(f"{stub}.png", strip = True)
-    matplotlib.pyplot.close(fg)
 
     # Stop looping if debugging ...
     if debug:
@@ -401,19 +411,26 @@ for lat, lon, title, stub in locs:
 # ******************************************************************************
 
 # Create figure ...
-fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
+fg = matplotlib.pyplot.figure(figsize = (9, 6))
+
+# Create axis ...
 ax = fg.add_subplot()
 
 # Loop over locations ...
 for lat, lon, title, stub in locs:
     # Plot data ...
-    x, y = numpy.loadtxt(f"{stub}.csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
+    x, y = numpy.loadtxt(
+        f"{stub}.csv",
+        delimiter = ",",
+         skiprows = 1,
+           unpack = True,
+    )                                                                           # [m], [m2]
     ax.plot(x / 1.0e3, y / 1.0e6, label = title)
 
 # Plot theoretical maximum ...
 ax.plot(radii / 1.0e3, numpy.pi * pow(radii, 2) / 1.0e6, label = "(theoretical maximum)", linestyle = ":")
 
-# Save figure ...
+# Configure axis ...
 ax.grid()
 ax.legend(fontsize = "small", loc = "upper left")
 ax.set_title("How much National Trust or Open Access land is nearby?")
@@ -421,24 +438,38 @@ ax.set_xlabel("Radius [km]")
 ax.set_xlim(radii[0], radii[-1] / 1.0e3)
 ax.set_ylabel("Area [km2]")
 ax.set_ylim(0.0, 6.0e3)
-fg.savefig("howMuchLandv1_plot1.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+
+# Configure figure ...
+fg.tight_layout()
+
+# Save figure ...
+fg.savefig("howMuchLandv1_plot1.png")
+matplotlib.pyplot.close(fg)
+
+# Optimize PNG ...
 if not debug:
     pyguymer3.image.optimize_image("howMuchLandv1_plot1.png", strip = True)
-matplotlib.pyplot.close(fg)
 
 # ******************************************************************************
 
 # Create figure ...
-fg = matplotlib.pyplot.figure(figsize = (9, 6), dpi = dpi)
+fg = matplotlib.pyplot.figure(figsize = (9, 6))
+
+# Create axis ...
 ax = fg.add_subplot()
 
 # Loop over locations ...
 for lat, lon, title, stub in locs:
     # Plot data ...
-    x, y = numpy.loadtxt(f"{stub}.csv", delimiter = ",", skiprows = 1, unpack = True)   # [m], [m2]
+    x, y = numpy.loadtxt(
+        f"{stub}.csv",
+        delimiter = ",",
+         skiprows = 1,
+           unpack = True,
+    )                                                                           # [m], [m2]
     ax.plot(x / 1.0e3, 100.0 * y / (numpy.pi * pow(x, 2)), label = title)
 
-# Save figure ...
+# Configure axis ...
 ax.grid()
 ax.legend(fontsize = "small", loc = "upper left")
 ax.set_title("How much National Trust or Open Access land is nearby?")
@@ -446,7 +477,14 @@ ax.set_xlabel("Radius [km]")
 ax.set_xlim(radii[0], radii[-1] / 1.0e3)
 ax.set_ylabel("Area [%]")
 ax.set_ylim(0.0, 100.0)
-fg.savefig("howMuchLandv1_plot2.png", bbox_inches = "tight", dpi = dpi, pad_inches = 0.1)
+
+# Configure figure ...
+fg.tight_layout()
+
+# Save figure ...
+fg.savefig("howMuchLandv1_plot2.png")
+matplotlib.pyplot.close(fg)
+
+# Optimize PNG ...
 if not debug:
     pyguymer3.image.optimize_image("howMuchLandv1_plot2.png", strip = True)
-matplotlib.pyplot.close(fg)
