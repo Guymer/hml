@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Define function ...
-def rasterizeShapefile(sfObj, kwArgCheck = None, nx = 1024, ny = 1024, px = 1024.0):
+def rasterizeShapefile(sfObj, /, *, nx = 1024, ny = 1024, px = 1024.0):
     """
     Rasterize a ShapeFile.
 
@@ -38,10 +38,6 @@ def rasterizeShapefile(sfObj, kwArgCheck = None, nx = 1024, ny = 1024, px = 1024
 
     # Import sub-functions ...
     from .rasterizePolygon import rasterizePolygon
-
-    # Check keyword arguments ...
-    if kwArgCheck is not None:
-        print(f"WARNING: \"{__name__}\" has been called with an extra positional argument")
 
     # Check argument ...
     if not isinstance(sfObj, shapefile.Reader):

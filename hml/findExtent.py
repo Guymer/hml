@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Define function ...
-def findExtent(sfObj, kwArgCheck = None, x1 = 1.0e10, x2 = 0.0, y1 = 1.0e10, y2 = 0.0):
+def findExtent(sfObj, /, *, x1 = 1.0e10, x2 = 0.0, y1 = 1.0e10, y2 = 0.0):
     """
     Update the supplied bounding box so that it encompasses the overall bounding
     box of the Polygons in the supplied ShapeFile.
@@ -21,10 +21,6 @@ def findExtent(sfObj, kwArgCheck = None, x1 = 1.0e10, x2 = 0.0, y1 = 1.0e10, y2 
         import shapefile
     except:
         raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
-
-    # Check keyword arguments ...
-    if kwArgCheck is not None:
-        print(f"WARNING: \"{__name__}\" has been called with an extra positional argument")
 
     # Check argument ...
     if not isinstance(sfObj, shapefile.Reader):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Define function ...
-def rasterizePolygon(poly, kwArgCheck = None, px = 1024.0):
+def rasterizePolygon(poly, /, *, px = 1024.0):
     """
     Rasterize a [Multi]Polygon.
 
@@ -28,10 +28,6 @@ def rasterizePolygon(poly, kwArgCheck = None, px = 1024.0):
         import shapely
     except:
         raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
-
-    # Check keyword arguments ...
-    if kwArgCheck is not None:
-        print(f"WARNING: \"{__name__}\" has been called with an extra positional argument")
 
     # Check argument ...
     if not isinstance(poly, shapely.geometry.polygon.Polygon):
