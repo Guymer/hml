@@ -1,4 +1,6 @@
 PURE SUBROUTINE findFractionOfPixelWithinCircle(ndiv, xmin, xmax, ymin, ymax, r, cx, cy, frac)
+    !f2py threadsafe
+
     ! Import standard modules ...
     USE ISO_C_BINDING
 

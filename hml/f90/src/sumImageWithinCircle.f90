@@ -1,4 +1,6 @@
 SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx, cy, img, tot)
+    !f2py threadsafe
+
     ! Import standard modules ...
     USE ISO_C_BINDING
 
