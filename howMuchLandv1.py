@@ -274,7 +274,7 @@ if __name__ == "__main__":
     # Loop over BINs ...
     for bname in sorted(glob.glob("*.bin")):
         # Deduce PNG name and skip this BIN if the PNG already exists ...
-        iname = f"{bname[:-4]}.png"
+        iname = f'{bname.removesuffix(".bin")}.png'
         if os.path.exists(iname):
             continue
 
