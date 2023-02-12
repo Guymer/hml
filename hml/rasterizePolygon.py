@@ -26,6 +26,7 @@ def rasterizePolygon(poly, /, *, px = 1024.0):
         raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
     try:
         import shapely
+        import shapely.geometry
     except:
         raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
 

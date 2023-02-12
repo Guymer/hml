@@ -32,6 +32,7 @@ def rasterizeShapefile(sfObj, /, *, nx = 1024, ny = 1024, px = 1024.0):
         raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
     try:
         import shapely
+        import shapely.geometry
         import shapely.validation
     except:
         raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
