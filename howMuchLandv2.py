@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
         # Merge lists in to a dictionary ...
         data = {}
-        for name, east, north, lon, lat in zip(names, easts, norths, lons, lats):
+        for name, east, north, lon, lat in zip(names, easts, norths, lons, lats, strict = True):
             data[name] = {
                 "easting" : east,                                               # [m]
                 "northing" : north,                                             # [m]
