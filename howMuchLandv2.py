@@ -6,7 +6,6 @@ if __name__ == "__main__":
     # Import standard modules ...
     import csv
     import json
-    import math
     import os
     import zipfile
 
@@ -115,7 +114,7 @@ if __name__ == "__main__":
                 norths.append(int(row["Northing"]))                             # [m]
 
                 # Append longitude and latitude to lists ...
-                lon, lat = pyguymer3.geo._en2ll(int(row["Easting"]), int(row["Northing"]))  # [°], [°]
+                lon, lat = pyguymer3.geo._en2ll(easts[-1], norths[-1])          # [°], [°]
                 lons.append(lon)                                                # [°]
                 lats.append(lat)                                                # [°]
 
@@ -123,10 +122,10 @@ if __name__ == "__main__":
         data = {}
         for name, east, north, lon, lat in zip(names, easts, norths, lons, lats, strict = True):
             data[name] = {
-                "easting" : east,                                               # [m]
-                "northing" : north,                                             # [m]
+                  "easting" : east,                                             # [m]
+                 "northing" : north,                                            # [m]
                 "longitude" : lon,                                              # [°]
-                "latitude" : lat,                                               # [°]
+                 "latitude" : lat,                                              # [°]
             }
 
         # Save database ...
@@ -145,25 +144,17 @@ if __name__ == "__main__":
     lons = numpy.array(lons)                                                    # [°]
     lats = numpy.array(lats)                                                    # [°]
 
-    # Define bounding box (for the first plot) ...
-    xmin, xmax, ymin, ymax = -8.5, 2.5, 49.5, 56.0                              # [°], [°], [°], [°]
-    extent1 = [xmin, xmax, ymin, ymax]                                          # [°]
-
-    # Define bounding box (for the second plots) ...
-    midx, midy = -2.0, 52.5                                                     # [°], [°]
-    extent2 = [midx - 3.75, midx + 3.75, midy - 2.5, midy + 2.5]                # [°]
-
     # **************************************************************************
 
     # Create figure ...
     fg = matplotlib.pyplot.figure(figsize = (9, 9))
 
     # Create axis ...
-    ax = fg.add_subplot(
-        projection = cartopy.crs.Orthographic(
-            central_longitude = 0.5 * (xmin + xmax),
-             central_latitude = 0.5 * (ymin + ymax),
-        ),
+    ax = pyguymer3.geo.add_top_down_axis(
+        fg,
+        -3.0,
+        52.9,
+        340.0e3,
     )
 
     # Configure axis ...
@@ -172,31 +163,20 @@ if __name__ == "__main__":
          linewidth = 0.5,
         resolution = "10m",
     )
-    ax.set_extent(extent1)
     ax.set_title("NT & OA Land With Railway Stations")
     pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
 
-    # Add grid lines manually ...
-    for loc in range(math.ceil(xmin), math.floor(xmax) + 1):
-        xlocs, ylocs = hml.calcVerticalGridlines(loc, extent1)                  # [°], [°]
-        ax.plot(
-            xlocs,
-            ylocs,
-                color = "white",
-            linestyle = ":",
-            linewidth = 0.5,
-            transform = cartopy.crs.PlateCarree(),
-        )
-    for loc in range(math.ceil(ymin), math.floor(ymax) + 1):
-        xlocs, ylocs = hml.calcHorizontalGridlines(loc, extent1)                # [°], [°]
-        ax.plot(
-            xlocs,
-            ylocs,
-                color = "white",
-            linestyle = ":",
-            linewidth = 0.5,
-            transform = cartopy.crs.PlateCarree(),
-        )
+    # Add notable lines of longitude and latitude manually ...
+    pyguymer3.geo.add_horizontal_gridlines(
+        ax,
+        color = "white",
+        locs = range(-90, +91, 1),
+    )
+    pyguymer3.geo.add_vertical_gridlines(
+        ax,
+        color = "white",
+        locs = range(-180, +181, 1),
+    )
 
     # Plot railway stations ...
     ax.scatter(
@@ -312,15 +292,14 @@ if __name__ == "__main__":
         fg = matplotlib.pyplot.figure(figsize = (9, 9))
 
         # Create axis ...
-        ax = fg.add_subplot(
-            projection = cartopy.crs.Orthographic(
-                central_longitude = midx,
-                 central_latitude = midy,
-            ),
+        ax = pyguymer3.geo.add_top_down_axis(
+            fg,
+            -3.0,
+            52.9,
+            340.0e3,
         )
 
         # Configure axis ...
-        ax.set_extent(extent2)
         ax.set_title("Railway Stations")
 
         # Plot railway stations (layering them correctly) ...
