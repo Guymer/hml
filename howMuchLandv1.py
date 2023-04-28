@@ -318,22 +318,19 @@ if __name__ == "__main__":
 
         print(f"Making \"{stub}.png\" ...")
 
-        # Define bounding box ...
-        xmin, xmax, ymin, ymax = lon - fov, lon + fov, lat - fov, lat + fov     # [°], [°], [°], [°]
-
         # Create figure ...
         fg = matplotlib.pyplot.figure(figsize = (9, 6))
 
         # Create axis ...
-        ax = fg.add_subplot(projection = cartopy.crs.PlateCarree())
+        ax = pyguymer3.geo.add_top_down_axis(
+            fg,
+            lon,
+            lat,
+            30.0e3,
+        )
 
         # Configure axis ...
-        ax.set_extent([xmin, xmax, ymin, ymax])
-        ax.set_title(f"NT & OA Land Nearby ({title})")
-        if debug:
-            ax.coastlines(resolution = "110m", color = "black", linewidth = 0.1)
-        else:
-            ax.coastlines(resolution = "10m", color = "black", linewidth = 0.1)
+        pyguymer3.geo.add_coastlines(ax, resolution = "i")
 
         # Draw background image ...
         ax.imshow(
@@ -358,6 +355,9 @@ if __name__ == "__main__":
                      vmax = float(px * px),
                      vmin = 0.0,
         )
+
+        # Configure axis ...
+        ax.set_title(f"NT & OA Land Nearby ({title})")
 
         # Configure figure ...
         fg.tight_layout()

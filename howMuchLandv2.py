@@ -158,12 +158,7 @@ if __name__ == "__main__":
     )
 
     # Configure axis ...
-    ax.coastlines(
-             color = "white",
-         linewidth = 0.5,
-        resolution = "10m",
-    )
-    ax.set_title("NT & OA Land With Railway Stations")
+    pyguymer3.geo.add_coastlines(ax, colorName = "white", resolution = "i")
     pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
 
     # Add notable lines of longitude and latitude manually ...
@@ -199,6 +194,9 @@ if __name__ == "__main__":
                origin = "upper",
             transform = cartopy.crs.OSGB(),
     )
+
+    # Configure axis ...
+    ax.set_title("NT & OA Land With Railway Stations")
 
     # Configure figure ...
     fg.tight_layout()
