@@ -278,7 +278,7 @@ if __name__ == "__main__":
             areas[i] = data[name]["integrals"][key]                             # [m2]
 
         # Find area of circle and convert areas to percentages ...
-        area = numpy.pi * (radii[ir] ** 2)                                      # [m2]
+        area = numpy.pi * pow(radii[ir], 2)                                     # [m2]
         percs = 100.0 * areas / area                                            # [%]
 
         # **********************************************************************
