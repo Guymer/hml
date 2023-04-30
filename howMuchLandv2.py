@@ -158,7 +158,7 @@ if __name__ == "__main__":
     )
 
     # Configure axis ...
-    pyguymer3.geo.add_coastlines(ax, colorName = "white", resolution = "i")
+    pyguymer3.geo.add_coastlines(ax, colorName = "white")
     pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
 
     # Add notable lines of longitude and latitude manually ...
