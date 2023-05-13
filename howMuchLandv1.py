@@ -4,7 +4,6 @@
 # NOTE: See https://docs.python.org/3.11/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
 if __name__ == "__main__":
     # Import standard modules ...
-    import copy
     import glob
     import io
     import json
@@ -37,6 +36,11 @@ if __name__ == "__main__":
         import shapefile
     except:
         raise Exception("\"shapefile\" is not installed; run \"pip install --user pyshp\"") from None
+    try:
+        import shapely
+        import shapely.geometry
+    except:
+        raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
 
     # Import my modules ...
     import hml
@@ -83,12 +87,9 @@ if __name__ == "__main__":
     if not isinstance(px, int):
         raise Exception("\"px\" must be an integer") from None
 
-    # Create copy of the colour map and hack the alpha values for our needs ...
-    # NOTE: https://stackoverflow.com/a/10127675
-    cmap = copy.copy(matplotlib.pyplot.get_cmap("jet"))
-    cmap._init()
-    for i in range(cmap.N):
-        cmap._lut[i, 3] = float(i) / float(cmap.N - 1)
+    # Load the colour tables ...
+    with open(f"{pyguymer3.__path__[0]}/data/json/colourTables.json", "rt", encoding = "utf-8") as fObj:
+        colourTables = json.load(fObj)
 
     # Load tile metadata ...
     with open("OrdnanceSurveyBackgroundImages/miniscale.json", "rt", encoding = "utf-8") as fObj:
@@ -307,6 +308,17 @@ if __name__ == "__main__":
     # Load grid ...
     grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))# [m2]
 
+    # Make a coloured version (with an alpha channel to hide pixels with no, or
+    # little, open land) ...
+    colouredGrid = numpy.zeros((ny, nx, 4), dtype = numpy.uint8)
+    for iy in range(ny):
+        for ix in range(nx):
+            level = min(255, max(0, round(255.0 * grid[iy, ix] / float(px * px))))
+            colouredGrid[iy, ix, 0] = colourTables["jet"][level][0]
+            colouredGrid[iy, ix, 1] = colourTables["jet"][level][1]
+            colouredGrid[iy, ix, 2] = colourTables["jet"][level][2]
+            colouredGrid[iy, ix, 3] = level
+
     # **************************************************************************
 
     # Loop over locations ...
@@ -345,14 +357,10 @@ if __name__ == "__main__":
 
         # Draw data ...
         ax.imshow(
-            grid,
-                     cmap = cmap,
+            colouredGrid,
                    extent = [0.0, nx * px, 0.0, ny * px],
-            interpolation = "bicubic",
                    origin = "lower",
                 transform = cartopy.crs.OSGB(),
-                     vmax = float(px * px),
-                     vmin = 0.0,
         )
 
         # Configure axis ...
@@ -387,7 +395,8 @@ if __name__ == "__main__":
         print(f"Making \"{stub}.csv\" ...")
 
         # Convert longitude/latitude to easting/northing ...
-        east, north = pyguymer3.geo._ll2en(lon, lat)                            # [m], [m]
+        pointLL = shapely.geometry.Point(lon, lat)
+        pointEN = pyguymer3.geo.ll2en(pointLL)
 
         # Open output file ...
         with open(f"{stub}.csv", "wt", encoding = "utf-8") as fObj:
@@ -404,8 +413,8 @@ if __name__ == "__main__":
                     ymin = 0.0,
                     ymax = float(ny * px),
                        r = radii[ir],
-                      cx = east,
-                      cy = north,
+                      cx = pointEN.x,
+                      cy = pointEN.y,
                      img = grid,
                 )
 

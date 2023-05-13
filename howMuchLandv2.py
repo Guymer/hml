@@ -30,6 +30,11 @@ if __name__ == "__main__":
         import numpy
     except:
         raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
+    try:
+        import shapely
+        import shapely.geometry
+    except:
+        raise Exception("\"shapely\" is not installed; run \"pip install --user Shapely\"") from None
 
     # Import my modules ...
     import hml
@@ -112,10 +117,13 @@ if __name__ == "__main__":
                 easts.append(int(row["Easting"]))                               # [m]
                 norths.append(int(row["Northing"]))                             # [m]
 
+                # Convert easting/northing to longitude/latitude ...
+                pointEN = shapely.geometry.Point(easts[-1], norths[-1])
+                pointLL = pyguymer3.geo.en2ll(pointEN)
+
                 # Append longitude and latitude to lists ...
-                lon, lat = pyguymer3.geo._en2ll(easts[-1], norths[-1])          # [°], [°]
-                lons.append(lon)                                                # [°]
-                lats.append(lat)                                                # [°]
+                lons.append(pointLL.x)                                          # [°]
+                lats.append(pointLL.y)                                          # [°]
 
         # Merge lists in to a dictionary ...
         data = {}
