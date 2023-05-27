@@ -1,4 +1,19 @@
-# Find executables ...
+# ******************************************************************************
+# *                                 VARIABLES                                  *
+# ******************************************************************************
+
+DEBUG     ?= false
+LIBDIR    ?= /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
+DEBG_OPTS := -g -fcheck=all
+LANG_OPTS := -ffree-form -ffree-line-length-none -frecursive -fno-unsafe-math-optimizations -frounding-math -fsignaling-nans -fPIC
+WARN_OPTS := -Wall -Wextra -Waliasing -Wcharacter-truncation -Wconversion-extra -Wimplicit-interface -Wimplicit-procedure -Wunderflow -Wtabs
+OPTM_OPTS := -O2
+MACH_OPTS := -march=native -m64
+
+# ******************************************************************************
+# *                                  BINARIES                                  *
+# ******************************************************************************
+
 CUT     := $(shell which cut            2> /dev/null || echo "ERROR")
 FC1     := $(shell which f2py-3.11      2> /dev/null || echo "ERROR")
 FC2     := $(shell which gfortran-mp-12 2> /dev/null || echo "ERROR")
@@ -7,26 +22,18 @@ LN      := $(shell which ln             2> /dev/null || echo "ERROR")
 PYTHON3 := $(shell which python3.11     2> /dev/null || echo "ERROR")
 RM      := $(shell which rm             2> /dev/null || echo "ERROR")
 
-# Set defaults ...
-DEBUG  ?= false
-LIBDIR ?= /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib
-
+# ******************************************************************************
+# *                             DYNAMIC VARIABLES                              *
 # ******************************************************************************
 
-# Set compiler flags ...
-DEBG_OPTS := -g -fcheck=all
-LANG_OPTS := -ffree-form -ffree-line-length-none -frecursive -fno-unsafe-math-optimizations -frounding-math -fsignaling-nans -fPIC
-WARN_OPTS := -Wall -Wextra -Waliasing -Wcharacter-truncation -Wconversion-extra -Wimplicit-interface -Wimplicit-procedure -Wunderflow -Wtabs
-OPTM_OPTS := -O2
-MACH_OPTS := -march=native -m64
-
-# If the user wants debugging then append the debugging flags to the language
-# flags ...
 ifeq ($(DEBUG), true)
 	LANG_OPTS += $(DEBG_OPTS)
 endif
 
-# Check binaries ...
+# ******************************************************************************
+# *                               CHECK BINARIES                               *
+# ******************************************************************************
+
 ifeq ($(CUT),ERROR)
     $(error The binary "cut" is not installed)
 endif
@@ -49,37 +56,48 @@ ifeq ($(RM),ERROR)
     $(error The binary "rm" is not installed)
 endif
 
-# Check Python modules ...
+# ******************************************************************************
+# *                            CHECK PYTHON MODULES                            *
+# ******************************************************************************
+
 # ifneq ($(shell $(PYTHON3) -c "import numpy; print(0)" 2> /dev/null),0)
-    # $(error The Python module "numpy" is not installed)
+#     $(error The Python module "numpy" is not installed)
 # endif
 
-# Set variables ...
+# ******************************************************************************
+# *                             DERIVED VARIABLES                              *
+# ******************************************************************************
+
 SUFFIX ?= $(shell $(PYTHON3) -c "import sysconfig; print(sysconfig.get_config_var(\"EXT_SUFFIX\"))")
 
+# ******************************************************************************
+# *                           USER-SPECIFIED TARGETS                           *
 # ******************************************************************************
 
 # "gmake -r [all]"   = "make compile" (default)
 all:		compile
 
 # "gmake -r clean"   = removes the compiled code
-clean:		$(RM)
+clean:
 	$(RM) -f *.mod *.o *.so
 
 # "gmake -r compile" = compiles the code
 compile:	funcs.so
 
 # "gmake -r help"    = print this help
-help:		$(GREP)																\
-			$(CUT)
+help:
 	echo "The suffix is \"${SUFFIX}\"."
 	echo "These are the available options:"
 	$(GREP) -E "^# \"gmake -r " Makefile | $(CUT) -c 2-
 
 # ******************************************************************************
+# *                            ENVIRONMENT SETTINGS                            *
+# ******************************************************************************
 
 .SILENT: help
 
+# ******************************************************************************
+# *                        INTERNALLY-SPECIFIED TARGETS                        *
 # ******************************************************************************
 
 # NOTE: As of 01/Nov/2019 there is still a bug in "gcc9" from MacPorts which
@@ -90,11 +108,7 @@ help:		$(GREP)																\
 #         * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90835
 #         * https://stackoverflow.com/a/58081934
 
-funcs.so:						$(FC1)											\
-								$(FC2)											\
-								$(LN)											\
-								$(RM)											\
-								funcs.F90										\
+funcs.so:						funcs.F90										\
 								src/*.f90
 	$(RM) -f funcs.*.so funcs.so
 	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -lgomp -m funcs funcs.F90 -L$(LIBDIR)
