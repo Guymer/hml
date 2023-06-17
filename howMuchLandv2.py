@@ -322,7 +322,7 @@ if __name__ == "__main__":
         )
 
         # Add colour bar ...
-        cb = fg.colorbar(sc)
+        cb = fg.colorbar(sc, ax = ax, orientation = "vertical")
 
         # Configure colour bar ...
         cb.set_label(f"NT & OA Land Within {key} [%]")

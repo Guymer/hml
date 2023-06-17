@@ -445,7 +445,7 @@ if __name__ == "__main__":
 
     # Configure axis ...
     ax.grid()
-    ax.legend(fontsize = "small", loc = "upper left")
+    ax.legend(loc = "upper left")
     ax.set_title("How much National Trust or Open Access land is nearby?")
     ax.set_xlabel("Radius [km]")
     ax.set_xlim(radii[0], radii[-1] / 1.0e3)
@@ -484,7 +484,7 @@ if __name__ == "__main__":
 
     # Configure axis ...
     ax.grid()
-    ax.legend(fontsize = "small", loc = "upper left")
+    ax.legend(loc = "upper left")
     ax.set_title("How much National Trust or Open Access land is nearby?")
     ax.set_xlabel("Radius [km]")
     ax.set_xlim(radii[0], radii[-1] / 1.0e3)
