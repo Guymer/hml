@@ -4,6 +4,7 @@
 # NOTE: See https://docs.python.org/3.11/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
 if __name__ == "__main__":
     # Import standard modules ...
+    import argparse
     import glob
     import io
     import json
@@ -61,6 +62,23 @@ if __name__ == "__main__":
     #         * https://en.wikipedia.org/wiki/Ordnance_Survey_National_Grid
     #         * https://commons.wikimedia.org/wiki/File:Ordnance_Survey_National_Grid.svg
 
+    # **************************************************************************
+
+    # Create argument parser and parse the arguments ...
+    parser = argparse.ArgumentParser(
+           allow_abbrev = False,
+            description = "HML: this project aims to show how much National Trust or Open Access land is nearby.",
+        formatter_class = argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "--debug",
+        action = "store_true",
+          help = "print debug messages",
+    )
+    args = parser.parse_args()
+
+    # **************************************************************************
+
     # Set pixel size, number of sub-divisions, number of radii and extent of
     # grid ...
     px = 128                                                                    # [m]
@@ -72,10 +90,9 @@ if __name__ == "__main__":
     # Set field-of-view ...
     fov = 0.5                                                                   # [°]
 
-    # Set mode and use it to override pixel size, number of sub-divisions,
-    # number of radii and extent of grid ...
-    debug = False
-    if debug:
+    # Use mode to override pixel size, number of sub-divisions, number of radii
+    # and extent of grid ...
+    if args.debug:
         px = 1024                                                               # [m]
         ndiv = 16                                                               # [#]
         nr = 16                                                                 # [#]
@@ -375,11 +392,10 @@ if __name__ == "__main__":
         matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
-        if not debug:
-            pyguymer3.image.optimize_image(f"{stub}.png", strip = True)
+        pyguymer3.image.optimize_image(f"{stub}.png", strip = True)
 
         # Stop looping if debugging ...
-        if debug:
+        if args.debug:
             break
 
     # **************************************************************************
@@ -461,8 +477,7 @@ if __name__ == "__main__":
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
-    if not debug:
-        pyguymer3.image.optimize_image("howMuchLandv1_plot1.png", strip = True)
+    pyguymer3.image.optimize_image("howMuchLandv1_plot1.png", strip = True)
 
     # **************************************************************************
 
@@ -500,5 +515,4 @@ if __name__ == "__main__":
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
-    if not debug:
-        pyguymer3.image.optimize_image("howMuchLandv1_plot2.png", strip = True)
+    pyguymer3.image.optimize_image("howMuchLandv1_plot2.png", strip = True)

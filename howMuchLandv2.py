@@ -4,6 +4,7 @@
 # NOTE: See https://docs.python.org/3.11/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
 if __name__ == "__main__":
     # Import standard modules ...
+    import argparse
     import csv
     import json
     import os
@@ -49,15 +50,29 @@ if __name__ == "__main__":
 
     # **************************************************************************
 
+    # Create argument parser and parse the arguments ...
+    parser = argparse.ArgumentParser(
+           allow_abbrev = False,
+            description = "HML: this project aims to show how much National Trust or Open Access land is nearby.",
+        formatter_class = argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "--debug",
+        action = "store_true",
+          help = "print debug messages",
+    )
+    args = parser.parse_args()
+
+    # **************************************************************************
+
     # Set pixel size, number of sub-divisions and extent of grid ...
     px = 128                                                                    # [m]
     ndiv = 128                                                                  # [#]
     nx = 5200                                                                   # [#]
     ny = 5200                                                                   # [#]
 
-    # Set mode and use it to override number of sub-divisions ...
-    debug = False
-    if debug:
+    # Use mode to override number of sub-divisions ...
+    if args.debug:
         ndiv = 16                                                               # [#]
 
     # **************************************************************************
