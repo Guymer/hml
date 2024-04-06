@@ -178,7 +178,7 @@ if __name__ == "__main__":
     fg = matplotlib.pyplot.figure(figsize = (7.2, 7.2))
 
     # Create axis ...
-    ax = pyguymer3.geo.add_top_down_axis(
+    ax = pyguymer3.geo.add_topDown_axis(
         fg,
         -3.0,
         52.9,
@@ -318,7 +318,7 @@ if __name__ == "__main__":
         fg = matplotlib.pyplot.figure()
 
         # Create axis ...
-        ax = pyguymer3.geo.add_top_down_axis(
+        ax = pyguymer3.geo.add_topDown_axis(
             fg,
             -3.0,
             52.9,
