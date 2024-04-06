@@ -182,7 +182,7 @@ if __name__ == "__main__":
         fg,
         -3.0,
         52.9,
-        340.0e3,
+        dist = 340.0e3,
     )
 
     # Configure axis ...
@@ -322,7 +322,7 @@ if __name__ == "__main__":
             fg,
             -3.0,
             52.9,
-            340.0e3,
+            dist = 340.0e3,
         )
 
         # Configure axis ...

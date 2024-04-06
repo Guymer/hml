@@ -360,7 +360,7 @@ if __name__ == "__main__":
             fg,
             lon,
             lat,
-            30.0e3,
+            dist = 30.0e3,
         )
 
         # Configure axis ...
