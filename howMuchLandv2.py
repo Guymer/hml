@@ -178,11 +178,11 @@ if __name__ == "__main__":
     fg = matplotlib.pyplot.figure(figsize = (7.2, 7.2))
 
     # Create axis ...
-    ax = pyguymer3.geo.add_topDown_axis(
+    ax = pyguymer3.geo.add_axis(
         fg,
-        -3.0,
-        52.9,
         dist = 340.0e3,
+         lat = 52.9,
+         lon = -3.0,
     )
 
     # Configure axis ...
@@ -318,11 +318,11 @@ if __name__ == "__main__":
         fg = matplotlib.pyplot.figure()
 
         # Create axis ...
-        ax = pyguymer3.geo.add_topDown_axis(
+        ax = pyguymer3.geo.add_axis(
             fg,
-            -3.0,
-            52.9,
             dist = 340.0e3,
+             lat = 52.9,
+             lon = -3.0,
         )
 
         # Configure axis ...
