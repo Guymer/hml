@@ -191,12 +191,16 @@ if __name__ == "__main__":
     pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
 
     # Plot railway stations ...
+    # NOTE: As of 5/Dec/2023, the default "zorder" of the coastlines is 1.5, the
+    #       default "zorder" of the gridlines is 2.0 and the default "zorder" of
+    #       the scattered points is 1.0.
     ax.scatter(
         lons,
         lats,
             color = "cyan",
                 s = 10.0,
         transform = cartopy.crs.PlateCarree(),
+           zorder = 5.0,
     )
 
     # Draw background image ...
@@ -318,6 +322,9 @@ if __name__ == "__main__":
         ax.set_title("Railway Stations")
 
         # Plot railway stations (layering them correctly) ...
+        # NOTE: As of 5/Dec/2023, the default "zorder" of the coastlines is 1.5,
+        #       the default "zorder" of the gridlines is 2.0 and the default
+        #       "zorder" of the scattered points is 1.0.
         sc = ax.scatter(
             lons[keys],
             lats[keys],
@@ -329,6 +336,7 @@ if __name__ == "__main__":
              transform = cartopy.crs.PlateCarree(),
                   vmax = 70.0,
                   vmin = 0.0,
+                zorder = 5.0,
         )
 
         # Add colour bar ...
