@@ -363,9 +363,6 @@ if __name__ == "__main__":
              lon = lon,
         )
 
-        # Configure axis ...
-        pyguymer3.geo.add_coastlines(ax)
-
         # Draw background image ...
         ax.imshow(
             matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),

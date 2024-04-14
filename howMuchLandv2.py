@@ -180,14 +180,14 @@ if __name__ == "__main__":
     # Create axis ...
     ax = pyguymer3.geo.add_axis(
         fg,
-                       dist = 340.0e3,
-        gridlines_linecolor = "white",
-                        lat = 52.9,
-                        lon = -3.0,
+        coastlines_edgecolor = "white",
+                        dist = 340.0e3,
+         gridlines_linecolor = "white",
+                         lat = 52.9,
+                         lon = -3.0,
     )
 
     # Configure axis ...
-    pyguymer3.geo.add_coastlines(ax, colorName = "white")
     pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
 
     # Plot railway stations ...
