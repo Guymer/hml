@@ -34,10 +34,11 @@ jobs:
                 name: Analysing the Python code with PyLint
                 run: |
                     export PYTHONPATH=${PWD}/pyguymer3:${PYTHONPATH}
+                    echo "::notice $(which f2py)"
+                    echo "::notice $(which gfortran)"
+                    echo "::notice $(which gmake)"
+                    echo "::notice $(which pip)"
+                    echo "::notice $(which python)"
                     cd main
-                    which f2py >> ${GITHUB_STEP_SUMMARY}
-                    which gfortran >> ${GITHUB_STEP_SUMMARY}
-                    which gmake >> ${GITHUB_STEP_SUMMARY}
-                    which pip >> ${GITHUB_STEP_SUMMARY}
-                    which python >> ${GITHUB_STEP_SUMMARY}
+                    gmake -r -C hml/f90 FC1=`which f2py` FC2=`which gfortran` PYTHON3=`which python`
                     pylint --rcfile=".pylintrc" --errors-only $(git ls-files "*.py")
