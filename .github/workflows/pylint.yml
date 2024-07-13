@@ -35,9 +35,9 @@ jobs:
                 run: |
                     export PYTHONPATH=${PWD}/pyguymer3:${PYTHONPATH}
                     cd main
-                    which f2py
-                    which gfortran
-                    which gmake
-                    which pip
-                    which python
+                    which f2py >> ${GITHUB_STEP_SUMMARY}
+                    which gfortran >> ${GITHUB_STEP_SUMMARY}
+                    which gmake >> ${GITHUB_STEP_SUMMARY}
+                    which pip >> ${GITHUB_STEP_SUMMARY}
+                    which python >> ${GITHUB_STEP_SUMMARY}
                     pylint --rcfile=".pylintrc" --errors-only $(git ls-files "*.py")
