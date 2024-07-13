@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     # Import my modules ...
     import hml
-    import hml.f90
+    import hml.f90                                                              # pylint: disable=E1101
     try:
         import pyguymer3
         import pyguymer3.geo
