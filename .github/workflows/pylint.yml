@@ -35,4 +35,9 @@ jobs:
                 run: |
                     export PYTHONPATH=${PWD}/pyguymer3:${PYTHONPATH}
                     cd main
-                    pylint --rcfile=".pylintrc" --errors-only $(git ls-files "*.py" | grep -v -F f90/)
+                    which f2py
+                    which gfortran
+                    which gmake
+                    which pip
+                    which python
+                    pylint --rcfile=".pylintrc" --errors-only $(git ls-files "*.py")
