@@ -5,5 +5,5 @@ pillow
 cartopy
 matplotlib
 numpy
-shapefile
+pyshp
 shapely
