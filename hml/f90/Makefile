@@ -108,8 +108,16 @@ help:
 #         * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90835
 #         * https://stackoverflow.com/a/58081934
 
+# NOTE: There was a bug in NumPy (using "meson" to build) where "f2py" would
+#       copy the file to a build folder but not copy the "INCLUDE" files and,
+#       therefore, the compilation would fail because it would not find the
+#       included file. To work around this I use the "--include-paths" argument
+#       as demonstrated in the test code added as part of the Pull Request which
+#       closed the following issue:
+#         * https://github.com/numpy/numpy/issues/25344
+
 funcs.so:						funcs.F90										\
 								src/*.f90
 	$(RM) -f funcs.*.so funcs.so
-	$(FC1) -c --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -lgomp -m funcs funcs.F90 -L$(LIBDIR)
+	$(FC1) -c --include-paths $(PWD) --f77exec=$(FC2) --f90exec=$(FC2) --opt="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS)" --arch="$(MACH_OPTS)" -lgomp -m funcs funcs.F90 -L$(LIBDIR)
 	$(LN) -s funcs$(SUFFIX) funcs.so
