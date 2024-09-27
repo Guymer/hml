@@ -4,6 +4,7 @@
 pillow
 cartopy
 matplotlib
+meson
 numpy
 pyshp
 shapely
