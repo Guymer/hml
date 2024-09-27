@@ -106,5 +106,5 @@ help:
 funcs.so:			funcs.F90													\
 					src/*.f90
 	$(RM) -f funcs.*.so funcs.so
-	FC=$(FC) FFLAGS="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS) $(MACH_OPTS)" $(PYTHON3) -m numpy.f2py -c funcs.F90 -m funcs --backend meson -lgomp -I$(PWD)
+	FC=$(FC) FFLAGS="-fopenmp $(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS) $(MACH_OPTS)" $(PYTHON3) -m numpy.f2py -c funcs.F90 -m funcs --backend meson -lgomp -I$(CURDIR)
 	$(LN) -s funcs$(SUFFIX) funcs.so
