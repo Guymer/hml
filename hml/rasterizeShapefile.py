@@ -49,7 +49,7 @@ def rasterizeShapefile(sfObj, /, *, nx = 1024, ny = 1024, px = 1024.0):
     globalGrid = numpy.zeros((ny, nx), dtype = numpy.float32)                   # [m2]
 
     # Create a pool of workers ...
-    with multiprocessing.Pool(maxtasksperchild = 1) as pool:
+    with multiprocessing.Pool(maxtasksperchild = 1) as pObj:
         # Initialize list ...
         results = []
 
@@ -71,7 +71,15 @@ def rasterizeShapefile(sfObj, /, *, nx = 1024, ny = 1024, px = 1024.0):
                 continue
 
             # Add rasterization job to worker pool ...
-            results.append(pool.apply_async(rasterizePolygon, (poly,), {"px" : px}))
+            results.append(
+                pObj.apply_async(
+                    rasterizePolygon,
+                    (poly,),
+                    {
+                        "px" : px,
+                    },
+                )
+            )
 
         print(f"INFO: {n:,d} records were skipped because they were invalid")
 
@@ -90,6 +98,15 @@ def rasterizeShapefile(sfObj, /, *, nx = 1024, ny = 1024, px = 1024.0):
                 for iy in range(localGrid.shape[0]):
                     # Add local grid to global grid ...
                     globalGrid[iy1 + iy, ix1 + ix] += localGrid[iy, ix]         # [m2]
+
+        # Close the pool of worker processes and wait for all of the tasks to
+        # finish ...
+        # NOTE: The "__exit__()" call of the context manager for
+        #       "multiprocessing.Pool()" calls "terminate()" instead of
+        #       "join()", so I must manage the end of the pool of worker
+        #       processes myself.
+        pObj.close()
+        pObj.join()
 
     # Return answer ...
     return globalGrid
