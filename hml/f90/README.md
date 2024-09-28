@@ -53,7 +53,7 @@ The above study has led me to create [.f2py_f2cmap](.f2py_f2cmap) to allow me to
 
 ## Documentation
 
-Obtained by running `python3.11 -c "import hml; import hml.f90; print(hml.f90.funcs.$FUNCTION.__doc__)"`.
+Obtained by running `python3.12 -c "import hml; import hml.f90; print(hml.f90.funcs.$FUNCTION.__doc__)"`.
 
 ```
 frac = findfractionofpixelwithincircle(ndiv,xmin,xmax,ymin,ymax,r,cx,cy)
