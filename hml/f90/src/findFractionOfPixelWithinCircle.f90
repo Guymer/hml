@@ -22,9 +22,16 @@ PURE SUBROUTINE findFractionOfPixelWithinCircle(ndiv, xmin, xmax, ymin, ymax, r,
     INTEGER(kind = C_LONG_LONG)                                                 :: iy
     REAL(kind = C_DOUBLE)                                                       :: dx
     REAL(kind = C_DOUBLE)                                                       :: dy
-    REAL(kind = C_DOUBLE), DIMENSION(ndiv)                                      :: xaxis
-    REAL(kind = C_DOUBLE), DIMENSION(ndiv)                                      :: yaxis
-    REAL(kind = C_DOUBLE), DIMENSION(ndiv, ndiv)                                :: dist
+    REAL(kind = C_DOUBLE), ALLOCATABLE, DIMENSION(:)                            :: xaxis
+    REAL(kind = C_DOUBLE), ALLOCATABLE, DIMENSION(:)                            :: yaxis
+    REAL(kind = C_DOUBLE), ALLOCATABLE, DIMENSION(:, :)                         :: dist
+
+    ! Allocate arrays ...
+    ! NOTE: I decided not to use "sub_allocate_array()" here so as to keep this
+    !       subroutine "PURE".
+    ALLOCATE(xaxis(ndiv))
+    ALLOCATE(yaxis(ndiv))
+    ALLOCATE(dist(ndiv, ndiv))
 
     ! Calculate size of pixels ...
     dx = (xmax - xmin) / REAL(ndiv, kind = C_DOUBLE)
@@ -47,6 +54,13 @@ PURE SUBROUTINE findFractionOfPixelWithinCircle(ndiv, xmin, xmax, ymin, ymax, r,
         END DO
     END DO
 
+    ! Clean up ...
+    DEALLOCATE(xaxis)
+    DEALLOCATE(yaxis)
+
     ! Calculate answer ...
     frac = REAL(COUNT(dist <= r, kind = C_LONG_LONG), kind = C_DOUBLE) / REAL(ndiv * ndiv, kind = C_DOUBLE)
+
+    ! Clean up ...
+    DEALLOCATE(dist)
 END SUBROUTINE findFractionOfPixelWithinCircle

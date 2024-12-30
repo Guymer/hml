@@ -26,9 +26,16 @@ SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx, cy,
     REAL(kind = C_DOUBLE)                                                       :: dx
     REAL(kind = C_DOUBLE)                                                       :: dy
     REAL(kind = C_DOUBLE)                                                       :: frac
-    REAL(kind = C_DOUBLE), DIMENSION(nx + 1)                                    :: xaxis
-    REAL(kind = C_DOUBLE), DIMENSION(ny + 1)                                    :: yaxis
-    REAL(kind = C_DOUBLE), DIMENSION(ny + 1, nx + 1)                            :: dist
+    REAL(kind = C_DOUBLE), ALLOCATABLE, DIMENSION(:)                            :: xaxis
+    REAL(kind = C_DOUBLE), ALLOCATABLE, DIMENSION(:)                            :: yaxis
+    REAL(kind = C_DOUBLE), ALLOCATABLE, DIMENSION(:, :)                         :: dist
+
+    ! Allocate arrays ...
+    ! NOTE: I decided not to use "sub_allocate_array()" here so as to not add a
+    !       dependency to this project.
+    ALLOCATE(xaxis(nx + 1))
+    ALLOCATE(yaxis(ny + 1))
+    ALLOCATE(dist(ny + 1, nx + 1))
 
     ! Calculate size of pixels ...
     dx = (xmax - xmin) / REAL(nx, kind = C_DOUBLE)
@@ -94,33 +101,37 @@ SUBROUTINE sumImageWithinCircle(ndiv, nx, ny, xmin, xmax, ymin, ymax, r, cx, cy,
                         CYCLE
                     END IF
 
-                    ! Skip this pixel if it is all outside of the circle ...
+                    ! Add none of this pixel if it is all outside the circle ...
                     IF(ALL(dist(iy:iy + 1_C_LONG_LONG, ix:ix + 1_C_LONG_LONG) >= r))THEN
                         CYCLE
                     END IF
 
-                    ! Check if this pixel is entirely within the circle or if it
-                    ! straddles the circumference ...
+                    ! Add all of this pixel if it is all within the circle ...
                     IF(ALL(dist(iy:iy + 1_C_LONG_LONG, ix:ix + 1_C_LONG_LONG) <= r))THEN
-                        ! Add all of the value to total ...
                         tot = tot + img(iy, ix)
-                    ELSE
-                        ! Add part of the value to total ...
-                        CALL findFractionOfPixelWithinCircle(                   &
-                            ndiv = ndiv,                                        &
-                            xmin = xaxis(ix),                                   &
-                            xmax = xaxis(ix + 1_C_LONG_LONG),                   &
-                            ymin = yaxis(iy),                                   &
-                            ymax = yaxis(iy + 1_C_LONG_LONG),                   &
-                               r = r,                                           &
-                              cx = 0.0e0_C_DOUBLE,                              &
-                              cy = 0.0e0_C_DOUBLE,                              &
-                            frac = frac                                         &
-                        )
-                        tot = tot + img(iy, ix) * frac
+                        CYCLE
                     END IF
+
+                    ! Add part of this pixel ...
+                    CALL findFractionOfPixelWithinCircle(                       &
+                        ndiv = ndiv,                                            &
+                        xmin = xaxis(ix),                                       &
+                        xmax = xaxis(ix + 1_C_LONG_LONG),                       &
+                        ymin = yaxis(iy),                                       &
+                        ymax = yaxis(iy + 1_C_LONG_LONG),                       &
+                           r = r,                                               &
+                          cx = 0.0e0_C_DOUBLE,                                  &
+                          cy = 0.0e0_C_DOUBLE,                                  &
+                        frac = frac                                             &
+                    )
+                    tot = tot + img(iy, ix) * frac
                 END DO
             END DO
         !$omp end do
     !$omp end parallel
+
+    ! Clean up ...
+    DEALLOCATE(xaxis)
+    DEALLOCATE(yaxis)
+    DEALLOCATE(dist)
 END SUBROUTINE sumImageWithinCircle
