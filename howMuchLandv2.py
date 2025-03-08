@@ -329,7 +329,7 @@ if __name__ == "__main__":
             lons[keys],
             lats[keys],
                      c = percs[keys],
-                  cmap = matplotlib.pyplot.cm.rainbow,
+                  cmap = matplotlib.colormaps["rainbow"],
             edgecolors = "black",
              linewidth = 0.1,
                      s = 10.0,
