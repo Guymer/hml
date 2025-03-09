@@ -1,5 +1,7 @@
 # How Much Land (HML)
 
+!["gmake" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/gmake.yaml/badge.svg) !["mypy" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/mypy.yaml/badge.svg) !["pylint" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/pylint.yaml/badge.svg)
+
 This project aims to show how much National Trust or Open Access land is nearby.
 
 [The script](howMuchLandv1.py) rasterizes three vector datasets onto a grid of pixels covering Great Britain with each pixel containing the total area of National Trust or Open Access land within.
