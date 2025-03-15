@@ -39,4 +39,4 @@ jobs:
                 run: |
                     cd main
                     gmake -r -C hml/f90 FC=`which gfortran` PYTHON3=`which python` compile
-                    pylint --rcfile=".pylintrc" --errors-only $(git ls-files "*.py")
+                    pylint --rcfile=".pylintrc" --errors-only $(git ls-files "*.py" | sort)
