@@ -1,6 +1,6 @@
 # How Much Land (HML)
 
-!["gmake" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/gmake.yaml/badge.svg) !["mypy" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/mypy.yaml/badge.svg) !["pylint" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/pylint.yaml/badge.svg)
+!["coverage" GitHub Action Status](https://github.com/Guymer/PyGuymer3/actions/workflows/coverage.yaml/badge.svg) !["gmake" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/gmake.yaml/badge.svg) !["mypy" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/mypy.yaml/badge.svg) !["profile" GitHub Action Status](https://github.com/Guymer/PyGuymer3/actions/workflows/profile.yaml/badge.svg) !["pylint" GitHub Action Status](https://github.com/Guymer/hml/actions/workflows/pylint.yaml/badge.svg) !["unittest" GitHub Action Status](https://github.com/Guymer/PyGuymer3/actions/workflows/unittest.yaml/badge.svg)
 
 This project aims to show how much National Trust or Open Access land is nearby.
 
