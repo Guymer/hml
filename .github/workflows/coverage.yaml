@@ -68,8 +68,10 @@ jobs:
             contents: write                                                     # Mandatory for deploying GitHub Pages.
             id-token: write                                                     # Mandatory for trusted publishing.
         steps:
-            - name: Setup Pages
+            -
+                name: Setup Pages
                 uses: actions/configure-pages@v5                                # https://github.com/actions/configure-pages
-            - name: Deploy to GitHub Pages
+            -
+                name: Deploy to GitHub Pages
                 id: deployment
                 uses: actions/deploy-pages@v4                                   # https://github.com/actions/deploy-pages
