@@ -65,13 +65,23 @@ jobs:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         permissions:
-            contents: write                                                     # Mandatory for deploying GitHub Pages.
+            pages: write                                                        # Mandatory for deploying GitHub Pages.
             id-token: write                                                     # Mandatory for trusted publishing.
         steps:
             -
                 name: Setup Pages
                 uses: actions/configure-pages@v5                                # https://github.com/actions/configure-pages
             -
+                name: Convert ZIP artifact to TAR.GZ web site
+                run: |
+                    pwd
+                    ls -hl
+                    # unzip "coverage-report (Python 3.13).zip" -d
+                    tar -cf github-pages.tar @coverage-report (Python 3.13).zip
+                    gzip -9f github-pages.tar
+            -
                 name: Deploy to GitHub Pages
                 id: deployment
                 uses: actions/deploy-pages@v4                                   # https://github.com/actions/deploy-pages
+                # with:
+                    # artifact_name: coverage-report (Python 3.13)
