@@ -5,7 +5,7 @@ on: [push]
 jobs:
     build:
         name: Build and calculate coverage of Python module
-        # if: startsWith(github.ref, 'refs/tags/')                                # Only calculate coverage on tag pushes.
+        if: startsWith(github.ref, 'refs/tags/')                                # Only calculate coverage on tag pushes.
         runs-on: ubuntu-24.04
         strategy:
             matrix:
