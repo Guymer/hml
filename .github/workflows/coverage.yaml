@@ -69,19 +69,27 @@ jobs:
             id-token: write                                                     # Mandatory for trusted publishing.
         steps:
             -
-                name: Setup Pages
-                uses: actions/configure-pages@v5                                # https://github.com/actions/configure-pages
+                name: Download a single coverage report
+                uses: actions/download-artifact@v4                              # https://github.com/actions/download-artifact
+                with:
+                    name: coverage-report (Python ${{ matrix.python-version }})
             -
                 name: Convert ZIP artifact to TAR.GZ web site
                 run: |
                     pwd
                     ls -hl
-                    # unzip "coverage-report (Python 3.13).zip" -d
-                    tar -cf github-pages.tar @coverage-report (Python 3.13).zip
+                    unzip "coverage-report (Python 3.13).zip"
+                    ls -hl
+                    rm "coverage-report (Python 3.13).zip"
+                    ls -hl
+                    tar -cf github-pages.tar *.*
+                    ls -hl
                     gzip -9f github-pages.tar
+                    ls -hl
+            -
+                name: Setup Pages
+                uses: actions/configure-pages@v5                                # https://github.com/actions/configure-pages
             -
                 name: Deploy to GitHub Pages
                 id: deployment
                 uses: actions/deploy-pages@v4                                   # https://github.com/actions/deploy-pages
-                # with:
-                    # artifact_name: coverage-report (Python 3.13)
