@@ -79,6 +79,12 @@ jobs:
                     tar -cf github-pages.tar *.*
                     gzip -9f github-pages.tar
             -
+                name: Upload coverage report (for future download)
+                uses: actions/upload-artifact@v4                                # https://github.com/actions/upload-artifact
+                with:
+                    name: github-pages
+                    path: github-pages.tar.gz
+            -
                 name: Setup Pages
                 uses: actions/configure-pages@v5                                # https://github.com/actions/configure-pages
             -
