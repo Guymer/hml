@@ -48,18 +48,18 @@ jobs:
                     coverage run -m unittest unitTests.py
                     coverage html --directory=coverage-output --include="hml/*"
             -
-                name: Upload GitHub Pages (for future download)
-                uses: actions/upload-pages-artifact@v3                          # https://github.com/actions/upload-pages-artifact
-                with:
-                    name: github-pages (Python ${{ matrix.python-version }})
-                    path: main/coverage-output
-            -
                 name: Upload coverage report (for future download)
                 uses: actions/upload-artifact@v4                                # https://github.com/actions/upload-artifact
                 with:
                     name: coverage-report (Python ${{ matrix.python-version }})
                     path: main/coverage-output
                     compression-level: 9
+            -
+                name: Upload GitHub Pages (for future download)
+                uses: actions/upload-pages-artifact@v3                          # https://github.com/actions/upload-pages-artifact
+                with:
+                    name: github-pages (Python ${{ matrix.python-version }})
+                    path: main/coverage-output
     publish-to-pages:
         # NOTE: Once it has been published then it will be available at:
         #         * https://guymer.github.io/hml/
