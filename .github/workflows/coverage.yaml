@@ -69,23 +69,15 @@ jobs:
             id-token: write                                                     # Mandatory for trusted publishing.
         steps:
             -
-                name: Download a single coverage report
+                name: Download coverage report
                 uses: actions/download-artifact@v4                              # https://github.com/actions/download-artifact
                 with:
                     name: coverage-report (Python 3.11)
             -
-                name: Convert ZIP artifact to TAR.GZ web site
+                name: Archive and compress the coverage report
                 run: |
-                    pwd
-                    ls -hl
-                    unzip "coverage-report (Python 3.11).zip"
-                    ls -hl
-                    rm "coverage-report (Python 3.11).zip"
-                    ls -hl
                     tar -cf github-pages.tar *.*
-                    ls -hl
                     gzip -9f github-pages.tar
-                    ls -hl
             -
                 name: Setup Pages
                 uses: actions/configure-pages@v5                                # https://github.com/actions/configure-pages
