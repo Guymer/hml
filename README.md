@@ -6,6 +6,8 @@ This project aims to show how much National Trust or Open Access land is nearby.
 
 [The script](howMuchLandv1.py) rasterizes three vector datasets onto a grid of pixels covering Great Britain with each pixel containing the total area of National Trust or Open Access land within.
 
+You may [browse the coverage report](https://guymer.github.io/hml/) for running [the unit tests](unitTests.py).
+
 ## Dependencies
 
 HML requires the following Python modules to be installed and available in your `PYTHONPATH`.
