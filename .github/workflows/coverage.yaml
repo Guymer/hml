@@ -48,6 +48,13 @@ jobs:
                     coverage run -m unittest unitTests.py
                     coverage html --directory=coverage-output --include="hml/*"
             -
+                name: Upload GitHub Pages (for future download)
+                id: deployment
+                uses: actions/upload-pages-artifact@v3                          # https://github.com/actions/upload-pages-artifact
+                with:
+                    name: github-pages (Python ${{ matrix.python-version }})
+                    path: main/coverage-output
+            -
                 name: Upload coverage report (for future download)
                 uses: actions/upload-artifact@v4                                # https://github.com/actions/upload-artifact
                 with:
@@ -69,25 +76,27 @@ jobs:
             id-token: write                                                     # Mandatory for trusted publishing.
         steps:
             -
-                name: Download coverage report
-                uses: actions/download-artifact@v4                              # https://github.com/actions/download-artifact
-                with:
-                    name: coverage-report (Python 3.11)
-            -
-                name: Archive and compress the coverage report
-                run: |
-                    tar -cf github-pages.tar *.*
-                    gzip -9f github-pages.tar
-            -
-                name: Upload coverage report (for future download)
-                uses: actions/upload-artifact@v4                                # https://github.com/actions/upload-artifact
-                with:
-                    name: github-pages
-                    path: github-pages.tar.gz
-            -
                 name: Setup Pages
                 uses: actions/configure-pages@v5                                # https://github.com/actions/configure-pages
+            # -
+            #     name: Download coverage report
+            #     uses: actions/download-artifact@v4                              # https://github.com/actions/download-artifact
+            #     with:
+            #         name: coverage-report (Python 3.11)
+            # -
+            #     name: Archive and compress the coverage report
+            #     run: |
+            #         tar -cf github-pages.tar *.*
+            #         gzip -9f github-pages.tar
+            # -
+            #     name: Upload coverage report (for future download)
+            #     uses: actions/upload-artifact@v4                                # https://github.com/actions/upload-artifact
+            #     with:
+            #         name: github-pages
+            #         path: github-pages.tar.gz
             -
                 name: Deploy to GitHub Pages
                 id: deployment
                 uses: actions/deploy-pages@v4                                   # https://github.com/actions/deploy-pages
+                with:
+                    name: github-pages (Python 3.11)
