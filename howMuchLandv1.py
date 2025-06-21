@@ -80,6 +80,12 @@ if __name__ == "__main__":
         action = "store_true",
           help = "print debug messages",
     )
+    parser.add_argument(
+        "--timeout",
+        default = 60.0,
+           help = "the timeout for any requests/subprocess calls (in seconds)",
+           type = float,
+    )
     args = parser.parse_args()
 
     # **************************************************************************
@@ -126,19 +132,37 @@ if __name__ == "__main__":
         fname = "alwaysOpen.zip"
         if not os.path.exists(fname):
             url = "https://opendata.arcgis.com/datasets/202ec400dfe9471aaf257e4b6c956394_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
-            pyguymer3.download_file(sess, url, fname)
+            pyguymer3.download_file(
+                sess,
+                url,
+                fname,
+                  debug = args.debug,
+                timeout = args.timeout,
+            )
 
         # Download dataset if it is missing ...
         fname = "limitedAccess.zip"
         if not os.path.exists(fname):
             url = "https://opendata.arcgis.com/datasets/f3cd21fd165e4e3498a83973bb5ba82f_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
-            pyguymer3.download_file(sess, url, fname)
+            pyguymer3.download_file(
+                sess,
+                url,
+                fname,
+                  debug = args.debug,
+                timeout = args.timeout,
+            )
 
         # Download dataset if it is missing ...
         fname = "openAccess.zip"
         if not os.path.exists(fname):
             url = "https://opendata.arcgis.com/datasets/6ce15f2cd06c4536983d315694dad16b_0.zip?outSR=%7B%22latestWkid%22%3A27700%2C%22wkid%22%3A27700%7D"
-            pyguymer3.download_file(sess, url, fname)
+            pyguymer3.download_file(
+                sess,
+                url,
+                fname,
+                  debug = args.debug,
+                timeout = args.timeout,
+            )
 
     # **************************************************************************
 
@@ -315,7 +339,13 @@ if __name__ == "__main__":
         grid *= 255.0                                                           # [colour level]
         numpy.place(grid, grid > 255.0, 255.0)                                  # [colour level]
         numpy.place(grid, grid <   0.0,   0.0)                                  # [colour level]
-        pyguymer3.image.save_array_as_image(grid, iname, ct = "rainbow")
+        pyguymer3.image.save_array_as_image(
+            grid,
+            iname,
+                 ct = "turbo",
+              debug = args.debug,
+            timeout = args.timeout,
+        )
 
     # **************************************************************************
 
@@ -337,9 +367,9 @@ if __name__ == "__main__":
     for iy in range(ny):
         for ix in range(nx):
             level = min(255, max(0, round(255.0 * grid[iy, ix] / float(px * px))))
-            colouredGrid[iy, ix, 0] = colourTables["jet"][level][0]
-            colouredGrid[iy, ix, 1] = colourTables["jet"][level][1]
-            colouredGrid[iy, ix, 2] = colourTables["jet"][level][2]
+            colouredGrid[iy, ix, 0] = colourTables["turbo"][level][0]
+            colouredGrid[iy, ix, 1] = colourTables["turbo"][level][1]
+            colouredGrid[iy, ix, 2] = colourTables["turbo"][level][2]
             colouredGrid[iy, ix, 3] = level
 
     # **************************************************************************
@@ -358,9 +388,10 @@ if __name__ == "__main__":
         # Create axis ...
         ax = pyguymer3.geo.add_axis(
             fg,
-            dist = 30.0e3,
-             lat = lat,
-             lon = lon,
+            debug = args.debug,
+             dist = 30.0e3,
+              lat = lat,
+              lon = lon,
         )
 
         # Draw background image ...
@@ -394,7 +425,12 @@ if __name__ == "__main__":
         matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
-        pyguymer3.image.optimize_image(f"{stub}.png", strip = True)
+        pyguymer3.image.optimize_image(
+            f"{stub}.png",
+              debug = args.debug,
+              strip = True,
+            timeout = args.timeout,
+        )
 
         # Stop looping if debugging ...
         if args.debug:
@@ -415,7 +451,10 @@ if __name__ == "__main__":
 
         # Convert longitude/latitude to easting/northing ...
         pointLL = shapely.geometry.Point(lon, lat)
-        pointEN = pyguymer3.geo.ll2en(pointLL)
+        pointEN = pyguymer3.geo.ll2en(
+            pointLL,
+            debug = args.debug,
+        )
 
         # Open output file ...
         with open(f"{stub}.csv", "wt", encoding = "utf-8") as fObj:
@@ -479,7 +518,12 @@ if __name__ == "__main__":
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
-    pyguymer3.image.optimize_image("howMuchLandv1_plot1.png", strip = True)
+    pyguymer3.image.optimize_image(
+        "howMuchLandv1_plot1.png",
+          debug = args.debug,
+          strip = True,
+        timeout = args.timeout,
+    )
 
     # **************************************************************************
 
@@ -517,4 +561,9 @@ if __name__ == "__main__":
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
-    pyguymer3.image.optimize_image("howMuchLandv1_plot2.png", strip = True)
+    pyguymer3.image.optimize_image(
+        "howMuchLandv1_plot2.png",
+          debug = args.debug,
+          strip = True,
+        timeout = args.timeout,
+    )

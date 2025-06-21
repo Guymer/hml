@@ -66,6 +66,12 @@ if __name__ == "__main__":
         action = "store_true",
           help = "print debug messages",
     )
+    parser.add_argument(
+        "--timeout",
+        default = 60.0,
+           help = "the timeout for any requests/subprocess calls (in seconds)",
+           type = float,
+    )
     args = parser.parse_args()
 
     # **************************************************************************
@@ -88,7 +94,13 @@ if __name__ == "__main__":
         fname = "NaPTANcsv.zip"
         if not os.path.exists(fname):
             url = "https://naptan.app.dft.gov.uk/DataRequest/Naptan.ashx?format=csv"
-            pyguymer3.download_file(sess, url, fname)
+            pyguymer3.download_file(
+                sess,
+                url,
+                fname,
+                  debug = args.debug,
+                timeout = args.timeout,
+            )
 
     # **************************************************************************
 
@@ -140,7 +152,10 @@ if __name__ == "__main__":
 
                 # Convert easting/northing to longitude/latitude ...
                 pointEN = shapely.geometry.Point(easts[-1], norths[-1])
-                pointLL = pyguymer3.geo.en2ll(pointEN)
+                pointLL = pyguymer3.geo.en2ll(
+                    pointEN,
+                    debug = args.debug,
+                )
 
                 # Append longitude and latitude to lists ...
                 lons.append(pointLL.x)                                          # [°]
@@ -181,6 +196,7 @@ if __name__ == "__main__":
     ax = pyguymer3.geo.add_axis(
         fg,
         coastlines_edgecolor = "white",
+                       debug = args.debug,
                         dist = 340.0e3,
          gridlines_linecolor = "white",
                          lat = 52.9,
@@ -188,7 +204,11 @@ if __name__ == "__main__":
     )
 
     # Configure axis ...
-    pyguymer3.geo.add_map_background(ax, resolution = "large8192px")
+    pyguymer3.geo.add_map_background(
+        ax,
+             debug = args.debug,
+        resolution = "large8192px",
+    )
 
     # Plot railway stations ...
     # NOTE: As of 5/Dec/2023, the default "zorder" of the coastlines is 1.5, the
@@ -227,7 +247,12 @@ if __name__ == "__main__":
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
-    pyguymer3.image.optimize_image("howMuchLandv2_plot1.png", strip = True)
+    pyguymer3.image.optimize_image(
+        "howMuchLandv2_plot1.png",
+          debug = args.debug,
+          strip = True,
+        timeout = args.timeout,
+    )
 
     # **************************************************************************
 
@@ -313,9 +338,10 @@ if __name__ == "__main__":
         # Create axis ...
         ax = pyguymer3.geo.add_axis(
             fg,
-            dist = 340.0e3,
-             lat = 52.9,
-             lon = -3.0,
+            debug = args.debug,
+             dist = 340.0e3,
+              lat = 52.9,
+              lon = -3.0,
         )
 
         # Configure axis ...
@@ -329,7 +355,7 @@ if __name__ == "__main__":
             lons[keys],
             lats[keys],
                      c = percs[keys],
-                  cmap = matplotlib.colormaps["rainbow"],
+                  cmap = matplotlib.colormaps["turbo"],
             edgecolors = "black",
              linewidth = 0.1,
                      s = 10.0,
@@ -365,7 +391,12 @@ if __name__ == "__main__":
         matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
-        pyguymer3.image.optimize_image(f"howMuchLandv2_plot2_{key}.png", strip = True)
+        pyguymer3.image.optimize_image(
+            f"howMuchLandv2_plot2_{key}.png",
+              debug = args.debug,
+              strip = True,
+            timeout = args.timeout,
+        )
 
         # **********************************************************************
 
