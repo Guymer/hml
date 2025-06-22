@@ -74,7 +74,7 @@ all:		compile
 
 # "gmake -r clean"   = removes the compiled code
 clean:
-	$(RM) -f *.mod *.o *.so
+	$(RM) -f *.a *.gcda *.gcno *.mod *.o *.so
 
 # "gmake -r compile" = compiles the code
 compile:	funcs.so
@@ -103,8 +103,21 @@ help:
 
 # NOTE: See https://numpy.org/doc/stable/f2py/buildtools/distutils-to-meson.html
 
+# NOTE: How GCC embeds the RPATH has changed, which results in binaries which do
+#       not work on MacOS 15.5 using GFortran 14.2 and Python 3.12 (as of
+#       21/Jun/2025). Here are two examples of other people having the same
+#       problem:
+#         * https://github.com/mesonbuild/meson/issues/10711
+#         * https://stackoverflow.com/questions/52430325/f2py-compilation-failed-cannot-find-library-gomp
+#       After hours of investigation, I have settled on a work around using
+#       "install_name_tool -add_rpath" on Darwin-based operating systems.
+
 funcs.so:			funcs.F90													\
 					src/*.f90
 	$(RM) -f funcs.*.so funcs.so
 	FC=$(FC) FFLAGS="$(LANG_OPTS) $(WARN_OPTS) $(OPTM_OPTS) $(MACH_OPTS)" $(PYTHON3) -m numpy.f2py -c funcs.F90 -m funcs --backend meson -lgomp -I$(CURDIR)
+	[[ $(shell uname) == "Darwin" ]] && install_name_tool -add_rpath /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib funcs$(SUFFIX)
+	[[ $(shell uname) == "Darwin" ]] && install_name_tool -add_rpath /opt/local/lib funcs$(SUFFIX)
+	[[ $(shell uname) == "Darwin" ]] && install_name_tool -add_rpath /opt/local/lib/libgcc funcs$(SUFFIX)
+	[[ $(shell uname) == "Darwin" ]] && install_name_tool -add_rpath /opt/local/lib/libomp funcs$(SUFFIX)
 	$(LN) -s funcs$(SUFFIX) funcs.so
