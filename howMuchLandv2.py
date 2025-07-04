@@ -247,7 +247,7 @@ if __name__ == "__main__":
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
-    pyguymer3.image.optimize_image(
+    pyguymer3.image.optimise_image(
         "howMuchLandv2_plot1.png",
           debug = args.debug,
           strip = True,
@@ -391,7 +391,7 @@ if __name__ == "__main__":
         matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
-        pyguymer3.image.optimize_image(
+        pyguymer3.image.optimise_image(
             f"howMuchLandv2_plot2_{key}.png",
               debug = args.debug,
               strip = True,
