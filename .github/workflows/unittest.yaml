@@ -35,12 +35,13 @@ jobs:
             -
                 name : Set PYTHONPATH and PYTHONSAFEPATH
                 run : |
-                    echo "PYTHONPATH=\"${PWD}/main:${PYTHONPATH}\"" >> $GITHUB_ENV
-                    echo "PYTHONSAFEPATH=\"a non-empty string\"" >> $GITHUB_ENV
+                    echo "PYTHONPATH=${PWD}/main:${PYTHONPATH}" >> $GITHUB_ENV
+                    echo "PYTHONSAFEPATH=aNonEmptyString" >> $GITHUB_ENV
             -
                 name: Test the Python ${{ matrix.python-version }} code
                 run: |
                     cd main
                     gmake -r -C hml/f90 FC=`which gfortran` PYTHON3=`which python` compile
+                    export
                     python -c "import sys; print(sys.path)"
                     python -m unittest unitTests.py
