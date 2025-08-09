@@ -42,9 +42,5 @@ jobs:
                 run: |
                     cd main
                     gmake -r -C hml/f90 FC=`which gfortran` PYTHON3=`which python` compile
-                    pwd
-                    echo ${PYTHONPATH}
-                    echo ${PYTHONSAFEPATH}
-                    ls -hl
-                    ls -hl unitTests.py
+                    python -c "import sys; print(sys.path)"
                     python -m unittest unitTests.py
