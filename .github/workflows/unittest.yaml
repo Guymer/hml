@@ -43,7 +43,8 @@ jobs:
                     cd main
                     gmake -r -C hml/f90 FC=`which gfortran` PYTHON3=`which python` compile
                     pwd
-                    ls -hl
                     echo ${PYTHONPATH}
                     echo ${PYTHONSAFEPATH}
+                    ls -hl
+                    ls -hl unitTests.py
                     python -m unittest unitTests.py
