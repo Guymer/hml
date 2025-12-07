@@ -400,13 +400,12 @@ if __name__ == "__main__":
         # Draw background image ...
         ax.imshow(
             matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),
-                     cmap = "gray",
-                   extent = meta["MiniScale_(relief1)_R22"]["extent"],
-            interpolation = "bicubic",
-                   origin = "upper",
-                transform = cartopy.crs.OSGB(),
-                     vmin = 0.0,
-                     vmax = 1.0,
+                 cmap = "gray",
+               extent = meta["MiniScale_(relief1)_R22"]["extent"],
+               origin = "upper",
+            transform = cartopy.crs.OSGB(),
+                 vmin = 0.0,
+                 vmax = 1.0,
         )
 
         # Draw data ...

@@ -233,10 +233,9 @@ if __name__ == "__main__":
     #       first 3 channels.
     ax.imshow(
         matplotlib.pyplot.imread("merged.png")[:, :, :3],
-               extent = [0.0, 128.0 * 5200.0, 0.0, 128.0 * 5200.0],
-        interpolation = "bicubic",
-               origin = "upper",
-            transform = cartopy.crs.OSGB(),
+           extent = [0.0, 128.0 * 5200.0, 0.0, 128.0 * 5200.0],
+           origin = "upper",
+        transform = cartopy.crs.OSGB(),
     )
 
     # Configure axis ...
@@ -377,13 +376,12 @@ if __name__ == "__main__":
         # Draw background image ...
         ax.imshow(
             matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),
-                     cmap = "gray",
-                   extent = meta["MiniScale_(mono)_R22"]["extent"],
-            interpolation = "bicubic",
-                   origin = "upper",
-                transform = cartopy.crs.OSGB(),
-                     vmax = 1.0,
-                     vmin = 0.0,
+                 cmap = "gray",
+               extent = meta["MiniScale_(mono)_R22"]["extent"],
+               origin = "upper",
+            transform = cartopy.crs.OSGB(),
+                 vmax = 1.0,
+                 vmin = 0.0,
         )
 
         # Configure figure ...
