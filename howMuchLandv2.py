@@ -209,8 +209,8 @@ if __name__ == "__main__":
     # Configure axis ...
     pyguymer3.geo.add_map_background(
         ax,
-             debug = args.debug,
-        resolution = "large8192px",
+          debug = args.debug,
+        subName = "large8192px",
     )
 
     # Plot railway stations ...
