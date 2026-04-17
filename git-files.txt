@@ -10,6 +10,7 @@
 .mypy.ini
 .pylint.ini
 .shellcheckrc
+git-files.txt
 hml/__init__.py
 hml/f90/__init__.py
 hml/f90/.f2py_f2cmap
