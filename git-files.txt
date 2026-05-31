@@ -4,7 +4,6 @@
 .github/workflows/gmake.yaml
 .github/workflows/mypy.yaml
 .github/workflows/profile.yaml
-.github/workflows/pylint.yaml
 .github/workflows/unittest.yaml
 .gitignore
 .mypy.ini
