@@ -63,15 +63,17 @@ def rasterizePolygon(poly, /, *, px = 1024.0):
             # Create a counter-clockwise polygon of the pixel, find its
             # intersection with the [Multi]Polygon and add the area to the local
             # grid ...
-            localGrid[iy, ix] += poly.intersection(
-                shapely.geometry.polygon.Polygon(
-                    [
-                        (xmin, ymin),
-                        (xmax, ymin),
-                        (xmax, ymax),
-                        (xmin, ymax),
-                        (xmin, ymin),
-                    ]
+            localGrid[iy, ix] += shapely.geometry.polygon.orient(
+                poly.intersection(
+                    shapely.geometry.polygon.Polygon(
+                        [
+                            (xmin, ymin),
+                            (xmax, ymin),
+                            (xmax, ymax),
+                            (xmin, ymax),
+                            (xmin, ymin),
+                        ]
+                    )
                 )
             ).area                                                              # [m2]
 
