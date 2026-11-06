@@ -8,19 +8,10 @@ if __name__ == "__main__":
     import csv
     import json
     import os
-    import pathlib
+    import warnings
     import zipfile
 
     # Import special modules ...
-    try:
-        import cartopy
-        cartopy.config.update(
-            {
-                "cache_dir" : pathlib.PosixPath("~/.local/share/cartopy").expanduser(),
-            }
-        )
-    except:
-        raise Exception("\"cartopy\" is not installed; run \"pip install --user Cartopy\"") from None
     try:
         import matplotlib
         matplotlib.rcParams.update(
@@ -42,6 +33,12 @@ if __name__ == "__main__":
         import numpy
     except:
         raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
+    try:
+        import PIL
+        import PIL.Image
+        PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                         # [px]
+    except:
+        raise Exception("\"PIL\" is not installed; run \"pip install --user Pillow\"") from None
     try:
         import shapely
         import shapely.geometry
@@ -224,21 +221,36 @@ if __name__ == "__main__":
         lats,
             color = "cyan",
                 s = 10.0,
-        transform = cartopy.crs.PlateCarree(),
+        transform = pyguymer3.GEODETIC,
            zorder = 5.0,
     )
 
-    # Draw background image ...
-    # NOTE: "merged.png" is an indexed PNG and for some reason it is loaded with
-    #       an alpha channel. This causes MatPlotLib to replace the entire
-    #       background image with black. To avoid such behaviour I only use the
-    #       first 3 channels.
-    ax.imshow(
-        matplotlib.pyplot.imread("merged.png")[:, :, :3],
-           extent = [0.0, 128.0 * 5200.0, 0.0, 128.0 * 5200.0],
-           origin = "upper",
-        transform = cartopy.crs.OSGB(),
-    )
+    # Calculate the regrid shape based off the resolution and the size of the
+    # figure, as well as a safety factor of 2 (remembering Nyquist) ...
+    regrid_shape = (
+        round(2.0 * fg.get_figwidth() * fg.get_dpi()),
+        round(2.0 * fg.get_figheight() * fg.get_dpi()),
+    )                                                                           # [px], [px]
+
+    # Load the image, convert the image to RGB and plot the converted image
+    # then let the context managers ".close()" each image object and then
+    # explicitly delete them (we don't want any memory leaks here) ...
+    with PIL.Image.open(
+        "merged.png",
+        mode = "r",
+    ) as iObj1:
+        with iObj1.convert("RGB") as iObj2:
+            ax.imshow(
+                iObj2,
+                       extent = [0.0, 128.0 * 5200.0, 0.0, 128.0 * 5200.0],
+                interpolation = "gaussian",
+                       origin = "upper",
+                 regrid_shape = regrid_shape,
+                     resample = False,
+                    transform = pyguymer3.OSGB,
+            )
+        del iObj2
+    del iObj1
 
     # Configure axis ...
     ax.set_title("NT & OA Land With Railway Stations")
@@ -246,9 +258,14 @@ if __name__ == "__main__":
     # Configure figure ...
     fg.tight_layout()
 
-    # Save figure ...
-    fg.savefig("howMuchLandv2_plot1.png")
-    matplotlib.pyplot.close(fg)
+    # Start a context manager for warnings ...
+    with warnings.catch_warnings():
+        # Hide "ignore" level warnings ...
+        warnings.simplefilter("ignore")
+
+        # Save figure ...
+        fg.savefig("howMuchLandv2_plot1.png")
+        matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
     pyguymer3.image.optimise_image(
@@ -363,7 +380,7 @@ if __name__ == "__main__":
             edgecolors = "black",
              linewidth = 0.1,
                      s = 10.0,
-             transform = cartopy.crs.PlateCarree(),
+             transform = pyguymer3.GEODETIC,
                   vmax = 70.0,
                   vmin = 0.0,
                 zorder = 5.0,
@@ -375,23 +392,42 @@ if __name__ == "__main__":
         # Configure colour bar ...
         cb.set_label(f"NT & OA Land Within {key} [%]")
 
-        # Draw background image ...
-        ax.imshow(
-            matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),
-                 cmap = "gray",
-               extent = meta["MiniScale_(mono)_R22"]["extent"],
-               origin = "upper",
-            transform = cartopy.crs.OSGB(),
-                 vmax = 1.0,
-                 vmin = 0.0,
-        )
+        # Calculate the regrid shape based off the resolution and the size of
+        # the figure, as well as a safety factor of 2 (remembering Nyquist) ...
+        regrid_shape = (
+            round(2.0 * fg.get_figwidth() * fg.get_dpi()),
+            round(2.0 * fg.get_figheight() * fg.get_dpi()),
+        )                                                                       # [px], [px]
+
+        # Load the image and plot the converted image then let the context
+        # manager ".close()" the image object and then explicitly delete it (we
+        # don't want any memory leaks here) ...
+        with PIL.Image.open(
+            f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}',
+            mode = "r",
+        ) as iObj:
+            ax.imshow(
+                iObj.convert("RGB"),
+                       extent = meta["MiniScale_(mono)_R22"]["extent"],
+                interpolation = "gaussian",
+                       origin = "upper",
+                 regrid_shape = regrid_shape,
+                     resample = False,
+                    transform = pyguymer3.OSGB,
+            )
+        del iObj
 
         # Configure figure ...
         fg.tight_layout()
 
-        # Save figure ...
-        fg.savefig(f"howMuchLandv2_plot2_{key}.png")
-        matplotlib.pyplot.close(fg)
+        # Start a context manager for warnings ...
+        with warnings.catch_warnings():
+            # Hide "ignore" level warnings ...
+            warnings.simplefilter("ignore")
+
+            # Save figure ...
+            fg.savefig(f"howMuchLandv2_plot2_{key}.png")
+            matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
         pyguymer3.image.optimise_image(

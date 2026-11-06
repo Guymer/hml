@@ -10,19 +10,10 @@ if __name__ == "__main__":
     import json
     import math
     import os
-    import pathlib
+    import warnings
     import zipfile
 
     # Import special modules ...
-    try:
-        import cartopy
-        cartopy.config.update(
-            {
-                "cache_dir" : pathlib.PosixPath("~/.local/share/cartopy").expanduser(),
-            }
-        )
-    except:
-        raise Exception("\"cartopy\" is not installed; run \"pip install --user Cartopy\"") from None
     try:
         import matplotlib
         matplotlib.rcParams.update(
@@ -44,6 +35,12 @@ if __name__ == "__main__":
         import numpy
     except:
         raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
+    try:
+        import PIL
+        import PIL.Image
+        PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                         # [px]
+    except:
+        raise Exception("\"PIL\" is not installed; run \"pip install --user Pillow\"") from None
     try:
         import shapefile
     except:
@@ -399,23 +396,40 @@ if __name__ == "__main__":
               lon = lon,
         )
 
-        # Draw background image ...
-        ax.imshow(
-            matplotlib.pyplot.imread(f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}'),
-                 cmap = "gray",
-               extent = meta["MiniScale_(relief1)_R22"]["extent"],
-               origin = "upper",
-            transform = cartopy.crs.OSGB(),
-                 vmin = 0.0,
-                 vmax = 1.0,
-        )
+        # Calculate the regrid shape based off the resolution and the size of
+        # the figure, as well as a safety factor of 2 (remembering Nyquist) ...
+        regrid_shape = (
+            round(2.0 * fg.get_figwidth() * fg.get_dpi()),
+            round(2.0 * fg.get_figheight() * fg.get_dpi()),
+        )                                                                       # [px], [px]
+
+        # Load the image and plot the converted image then let the context
+        # manager ".close()" the image object and then explicitly delete it (we
+        # don't want any memory leaks here) ...
+        with PIL.Image.open(
+            f'OrdnanceSurveyBackgroundImages/{meta["MiniScale_(mono)_R22"]["greyscale"]}',
+            mode = "r",
+        ) as iObj:
+            ax.imshow(
+                iObj.convert("RGB"),
+                       extent = meta["MiniScale_(mono)_R22"]["extent"],
+                interpolation = "gaussian",
+                       origin = "upper",
+                 regrid_shape = regrid_shape,
+                     resample = False,
+                    transform = pyguymer3.OSGB,
+            )
+        del iObj
 
         # Draw data ...
         ax.imshow(
             colouredGrid,
                    extent = [0.0, nx * px, 0.0, ny * px],
+            interpolation = "gaussian",
                    origin = "lower",
-                transform = cartopy.crs.OSGB(),
+             regrid_shape = regrid_shape,
+                 resample = False,
+                transform = pyguymer3.OSGB,
         )
 
         # Configure axis ...
@@ -424,9 +438,14 @@ if __name__ == "__main__":
         # Configure figure ...
         fg.tight_layout()
 
-        # Save figure ...
-        fg.savefig(f"{stub}.png")
-        matplotlib.pyplot.close(fg)
+        # Start a context manager for warnings ...
+        with warnings.catch_warnings():
+            # Hide "ignore" level warnings ...
+            warnings.simplefilter("ignore")
+
+            # Save figure ...
+            fg.savefig(f"{stub}.png")
+            matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
         pyguymer3.image.optimise_image(
@@ -517,9 +536,14 @@ if __name__ == "__main__":
     # Configure figure ...
     fg.tight_layout()
 
-    # Save figure ...
-    fg.savefig("howMuchLandv1_plot1.png")
-    matplotlib.pyplot.close(fg)
+    # Start a context manager for warnings ...
+    with warnings.catch_warnings():
+        # Hide "ignore" level warnings ...
+        warnings.simplefilter("ignore")
+
+        # Save figure ...
+        fg.savefig("howMuchLandv1_plot1.png")
+        matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
     pyguymer3.image.optimise_image(
@@ -560,9 +584,14 @@ if __name__ == "__main__":
     # Configure figure ...
     fg.tight_layout()
 
-    # Save figure ...
-    fg.savefig("howMuchLandv1_plot2.png")
-    matplotlib.pyplot.close(fg)
+    # Start a context manager for warnings ...
+    with warnings.catch_warnings():
+        # Hide "ignore" level warnings ...
+        warnings.simplefilter("ignore")
+
+        # Save figure ...
+        fg.savefig("howMuchLandv1_plot2.png")
+        matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
     pyguymer3.image.optimise_image(
