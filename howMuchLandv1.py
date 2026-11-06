@@ -118,12 +118,21 @@ if __name__ == "__main__":
     if not isinstance(px, int):
         raise Exception("\"px\" must be an integer") from None
 
-    # Load the colour tables ...
-    with open(f"{pyguymer3.__path__[0]}/data/json/colourTables.json", mode = "rt", encoding = "utf-8") as fObj:
+    # Load the colour tables and create short-hand ...
+    with open(
+        f"{pyguymer3.__path__[0]}/data/json/colourTables.json",
+        encoding = "utf-8",
+            mode = "rt",
+    ) as fObj:
         colourTables = json.load(fObj)
+    turbo = numpy.array(colourTables["turbo"]).astype(numpy.uint8)
 
     # Load tile metadata ...
-    with open("OrdnanceSurveyBackgroundImages/miniscale.json", mode = "rt", encoding = "utf-8") as fObj:
+    with open(
+        "OrdnanceSurveyBackgroundImages/miniscale.json",
+        encoding = "utf-8",
+            mode = "rt",
+    ) as fObj:
         meta = json.load(fObj)
 
     # **************************************************************************
@@ -179,7 +188,10 @@ if __name__ == "__main__":
     print("Finding extent of \"alwaysOpen.zip\" ...")
 
     # Load dataset ...
-    with zipfile.ZipFile("alwaysOpen.zip", mode = "r") as zfObj:
+    with zipfile.ZipFile(
+        "alwaysOpen.zip",
+        mode = "r",
+    ) as zfObj:
         # Read files into RAM so that they become seekable ...
         # NOTE: https://stackoverflow.com/a/12025492
         dbfObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.dbf"))
@@ -187,17 +199,30 @@ if __name__ == "__main__":
         shxObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shx"))
 
         # Open shapefile ...
-        sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+        sfObj = shapefile.Reader(
+            dbf = dbfObj,
+            shp = shpObj,
+            shx = shxObj,
+        )
 
         # Update extents ...
-        x1, y1, x2, y2 = hml.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)  # [m], [m], [m], [m]
+        x1, y1, x2, y2 = hml.findExtent(
+            sfObj,
+            x1 = x1,
+            y1 = y1,
+            x2 = x2,
+            y2 = y2,
+        )                                                                       # [m], [m], [m], [m]
 
     # **************************************************************************
 
     print("Finding extent of \"limitedAccess.zip\" ...")
 
     # Load dataset ...
-    with zipfile.ZipFile("limitedAccess.zip", mode = "r") as zfObj:
+    with zipfile.ZipFile(
+        "limitedAccess.zip",
+        mode = "r",
+    ) as zfObj:
         # Read files into RAM so that they become seekable ...
         # NOTE: https://stackoverflow.com/a/12025492
         dbfObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.dbf"))
@@ -205,17 +230,30 @@ if __name__ == "__main__":
         shxObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shx"))
 
         # Open shapefile ...
-        sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+        sfObj = shapefile.Reader(
+            dbf = dbfObj,
+            shp = shpObj,
+            shx = shxObj,
+        )
 
         # Update extents ...
-        x1, y1, x2, y2 = hml.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)  # [m], [m], [m], [m]
+        x1, y1, x2, y2 = hml.findExtent(
+            sfObj,
+            x1 = x1,
+            y1 = y1,
+            x2 = x2,
+            y2 = y2,
+        )                                                                       # [m], [m], [m], [m]
 
     # **************************************************************************
 
     print("Finding extent of \"openAccess.zip\" ...")
 
     # Load dataset ...
-    with zipfile.ZipFile("openAccess.zip", mode = "r") as zfObj:
+    with zipfile.ZipFile(
+        "openAccess.zip",
+        mode = "r",
+    ) as zfObj:
         # Read files into RAM so that they become seekable ...
         # NOTE: https://stackoverflow.com/a/12025492
         dbfObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.dbf"))
@@ -223,10 +261,20 @@ if __name__ == "__main__":
         shxObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shx"))
 
         # Open shapefile ...
-        sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+        sfObj = shapefile.Reader(
+            dbf = dbfObj,
+            shp = shpObj,
+            shx = shxObj,
+        )
 
         # Update extents ...
-        x1, y1, x2, y2 = hml.findExtent(sfObj, x1 = x1, y1 = y1, x2 = x2, y2 = y2)  # [m], [m], [m], [m]
+        x1, y1, x2, y2 = hml.findExtent(
+            sfObj,
+            x1 = x1,
+            y1 = y1,
+            x2 = x2,
+            y2 = y2,
+        )                                                                       # [m], [m], [m], [m]
 
     # **************************************************************************
 
@@ -247,7 +295,10 @@ if __name__ == "__main__":
         print("Rasterizing \"alwaysOpen.zip\" ...")
 
         # Load dataset ...
-        with zipfile.ZipFile("alwaysOpen.zip", mode = "r") as zfObj:
+        with zipfile.ZipFile(
+            "alwaysOpen.zip",
+            mode = "r",
+        ) as zfObj:
             # Read files into RAM so that they become seekable ...
             # NOTE: https://stackoverflow.com/a/12025492
             dbfObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.dbf"))
@@ -255,10 +306,19 @@ if __name__ == "__main__":
             shxObj = io.BytesIO(zfObj.read("d00dbcdd-ca42-4b51-9889-50627184f7602020313-1-1rdxbnd.c0er.shx"))
 
             # Open shapefile ...
-            sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+            sfObj = shapefile.Reader(
+                dbf = dbfObj,
+                shp = shpObj,
+                shx = shxObj,
+            )
 
             # Rasterize and save to BIN ...
-            grid = hml.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
+            grid = hml.rasterizeShapefile(
+                sfObj,
+                px = float(px),
+                nx = nx,
+                ny = ny,
+            )
             grid.tofile("alwaysOpen.bin")
 
     # **************************************************************************
@@ -268,7 +328,10 @@ if __name__ == "__main__":
         print("Rasterizing \"limitedAccess.zip\" ...")
 
         # Load dataset ...
-        with zipfile.ZipFile("limitedAccess.zip", mode = "r") as zfObj:
+        with zipfile.ZipFile(
+            "limitedAccess.zip",
+            mode = "r",
+        ) as zfObj:
             # Read files into RAM so that they become seekable ...
             # NOTE: https://stackoverflow.com/a/12025492
             dbfObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.dbf"))
@@ -276,10 +339,19 @@ if __name__ == "__main__":
             shxObj = io.BytesIO(zfObj.read("9a97e056-3bd9-4817-a9c5-ad7de1f31a1d2020313-1-rlrdj0.1jac.shx"))
 
             # Open shapefile ...
-            sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+            sfObj = shapefile.Reader(
+                dbf = dbfObj,
+                shp = shpObj,
+                shx = shxObj,
+            )
 
             # Rasterize and save to BIN ...
-            grid = hml.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
+            grid = hml.rasterizeShapefile(
+                sfObj,
+                px = float(px),
+                nx = nx,
+                ny = ny,
+            )
             grid.tofile("limitedAccess.bin")
 
     # **************************************************************************
@@ -289,7 +361,10 @@ if __name__ == "__main__":
         print("Rasterizing \"openAccess.zip\" ...")
 
         # Load dataset ...
-        with zipfile.ZipFile("openAccess.zip", mode = "r") as zfObj:
+        with zipfile.ZipFile(
+            "openAccess.zip",
+            mode = "r",
+        ) as zfObj:
             # Read files into RAM so that they become seekable ...
             # NOTE: https://stackoverflow.com/a/12025492
             dbfObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.dbf"))
@@ -297,10 +372,19 @@ if __name__ == "__main__":
             shxObj = io.BytesIO(zfObj.read("CRoW_Access_Land___Natural_England.shx"))
 
             # Open shapefile ...
-            sfObj = shapefile.Reader(dbf = dbfObj, shp = shpObj, shx = shxObj)
+            sfObj = shapefile.Reader(
+                dbf = dbfObj,
+                shp = shpObj,
+                shx = shxObj,
+            )
 
             # Rasterize and save to BIN ...
-            grid = hml.rasterizeShapefile(sfObj, px = float(px), nx = nx, ny = ny)
+            grid = hml.rasterizeShapefile(
+                sfObj,
+                px = float(px),
+                nx = nx,
+                ny = ny,
+            )
             grid.tofile("openAccess.bin")
 
     # **************************************************************************
@@ -313,9 +397,16 @@ if __name__ == "__main__":
         # NOTE: I do not need to .reshape() them here as the total is being
         #       saved back to the disk immediately.
         (
-            numpy.fromfile("alwaysOpen.bin", dtype = numpy.float32) +
-            numpy.fromfile("limitedAccess.bin", dtype = numpy.float32) +
-            numpy.fromfile("openAccess.bin", dtype = numpy.float32)
+            numpy.fromfile(
+                "alwaysOpen.bin",
+                dtype = numpy.float32,
+            ) + numpy.fromfile(
+                "limitedAccess.bin",
+                dtype = numpy.float32,
+            ) + numpy.fromfile(
+                "openAccess.bin",
+                dtype = numpy.float32,
+            )
         ).tofile("merged.bin")
 
     # **************************************************************************
@@ -335,19 +426,39 @@ if __name__ == "__main__":
         #       positive axes from an origin in the upper-left corner.
         #       Therefore, the y-axis needs flipping before the BIN can be saved
         #       as a PNG.
-        grid = numpy.fromfile(bname, dtype = numpy.float32).reshape((ny, nx))   # [m2]
+        grid = numpy.fromfile(
+            bname,
+            dtype = numpy.float32,
+        ).reshape(ny, nx, 1)                                                    # [m2]
         grid = numpy.flip(grid, axis = 0)                                       # [m2]
         grid /= float(px * px)                                                  # [fraction]
         grid *= 255.0                                                           # [colour level]
-        numpy.place(grid, grid > 255.0, 255.0)                                  # [colour level]
         numpy.place(grid, grid <   0.0,   0.0)                                  # [colour level]
-        pyguymer3.image.save_array_as_image(
+        numpy.place(grid, grid > 255.0, 255.0)                                  # [colour level]
+        grid = grid.astype(numpy.uint8)                                         # [colour level]
+        src = pyguymer3.image.makePng(
             grid,
-            iname,
-                 ct = "turbo",
-              debug = args.debug,
-            timeout = args.timeout,
+            calcAdaptive = True,
+             calcAverage = True,
+                calcNone = True,
+               calcPaeth = True,
+                 calcSub = True,
+                  calcUp = True,
+                 choices = "all",
+                   debug = args.debug,
+                     dpi = None,
+                  levels = [9,],
+               memLevels = [9,],
+                 modTime = None,
+                palUint8 = turbo,
+              strategies = None,
+                  wbitss = [15,],
         )
+        with open(
+            iname,
+            mode = "wb",
+        ) as fObj:
+            fObj.write(src)
 
     # **************************************************************************
 
@@ -361,14 +472,26 @@ if __name__ == "__main__":
     ]
 
     # Load grid ...
-    grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))# [m2]
+    grid = numpy.fromfile(
+        "merged.bin",
+        dtype = numpy.float32,
+    ).reshape(ny, nx)                                                           # [m2]
 
     # Make a coloured version (with an alpha channel to hide pixels with no, or
     # little, open land) ...
-    colouredGrid = numpy.zeros((ny, nx, 4), dtype = numpy.uint8)
+    colouredGrid = numpy.zeros(
+        (ny, nx, 4),
+        dtype = numpy.uint8,
+    )
     for iy in range(ny):
         for ix in range(nx):
-            level = min(255, max(0, round(255.0 * grid[iy, ix] / float(px * px))))
+            level = min(
+                255,
+                max(
+                    0,
+                    round(255.0 * grid[iy, ix] / float(px * px)),
+                ),
+            )
             colouredGrid[iy, ix, 0] = colourTables["turbo"][level][0]
             colouredGrid[iy, ix, 1] = colourTables["turbo"][level][1]
             colouredGrid[iy, ix, 2] = colourTables["turbo"][level][2]
@@ -462,7 +585,11 @@ if __name__ == "__main__":
     # **************************************************************************
 
     # Make radii ...
-    radii = numpy.linspace(0.0, 100.0e3, num = nr)                              # [m]
+    radii = numpy.linspace(
+        0.0,
+        100.0e3,
+        num = nr,
+    )                                                                           # [m]
 
     # Loop over locations ...
     for lat, lon, title, stub in locs:
@@ -480,7 +607,11 @@ if __name__ == "__main__":
         )
 
         # Open output file ...
-        with open(f"{stub}.csv", mode = "wt", encoding = "utf-8") as fObj:
+        with open(
+            f"{stub}.csv",
+            encoding = "utf-8",
+                mode = "wt",
+        ) as fObj:
             # Write header ...
             fObj.write("radius [m],open area [m2]\n")
 
@@ -519,10 +650,19 @@ if __name__ == "__main__":
              skiprows = 1,
                unpack = True,
         )                                                                       # [m], [m2]
-        ax.plot(x / 1.0e3, y / 1.0e6, label = title)
+        ax.plot(
+            x / 1.0e3,
+            y / 1.0e6,
+            label = title,
+        )
 
     # Plot theoretical maximum ...
-    ax.plot(radii / 1.0e3, numpy.pi * pow(radii, 2) / 1.0e6, label = "(theoretical maximum)", linestyle = ":")
+    ax.plot(
+        radii / 1.0e3,
+        numpy.pi * pow(radii, 2) / 1.0e6,
+            label = "(theoretical maximum)",
+        linestyle = ":",
+    )
 
     # Configure axis ...
     ax.grid()
@@ -570,7 +710,11 @@ if __name__ == "__main__":
              skiprows = 1,
                unpack = True,
         )                                                                       # [m], [m2]
-        ax.plot(x / 1.0e3, 100.0 * y / (numpy.pi * pow(x, 2)), label = title)
+        ax.plot(
+            x / 1.0e3,
+            100.0 * y / (numpy.pi * pow(x, 2)),
+            label = title,
+        )
 
     # Configure axis ...
     ax.grid()

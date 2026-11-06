@@ -109,7 +109,11 @@ if __name__ == "__main__":
     # Check if the JSON database exists ...
     if os.path.exists("howMuchLandv2.json"):
         # Load database ...
-        with open("howMuchLandv2.json", mode = "rt", encoding = "utf-8") as fObj:
+        with open(
+            "howMuchLandv2.json",
+            encoding = "utf-8",
+                mode = "rt",
+        ) as fObj:
             data = json.load(fObj)
 
         # Initialize lists ...
@@ -135,7 +139,10 @@ if __name__ == "__main__":
         lats = []                                                               # [°]
 
         # Load dataset ...
-        with zipfile.ZipFile("NaPTANcsv.zip", mode = "r") as zfObj:
+        with zipfile.ZipFile(
+            "NaPTANcsv.zip",
+            mode = "r",
+        ) as zfObj:
             # Load CSV file into RAM as a UTF-8 string and remove erroneous NULL
             # bytes ...
             csvSrc = zfObj.read("StopAreas.csv").decode("utf-8").replace("\x00", " ").strip()
@@ -174,7 +181,11 @@ if __name__ == "__main__":
             }
 
         # Save database ...
-        with open("howMuchLandv2.json", mode = "wt", encoding = "utf-8") as fObj:
+        with open(
+            "howMuchLandv2.json",
+            encoding = "utf-8",
+                mode = "wt",
+        ) as fObj:
             json.dump(
                 data,
                 fObj,
@@ -278,10 +289,17 @@ if __name__ == "__main__":
     # **************************************************************************
 
     # Load grid ...
-    grid = numpy.fromfile("merged.bin", dtype = numpy.float32).reshape((ny, nx))# [m2]
+    grid = numpy.fromfile(
+        "merged.bin",
+        dtype = numpy.float32,
+    ).reshape(ny, nx)                                                           # [m2]
 
     # Make radii ...
-    radii = numpy.linspace(0.0, 50.0e3, num = 6)                                # [m]
+    radii = numpy.linspace(
+        0.0,
+        50.0e3,
+        num = 6,
+    )                                                                           # [m]
 
     # Loop over stations ...
     for name in names:
@@ -314,7 +332,11 @@ if __name__ == "__main__":
             )                                                                   # [m2]
 
     # Save database ...
-    with open("howMuchLandv2.json", mode = "wt", encoding = "utf-8") as fObj:
+    with open(
+        "howMuchLandv2.json",
+        encoding = "utf-8",
+            mode = "wt",
+    ) as fObj:
         json.dump(
             data,
             fObj,
@@ -326,7 +348,11 @@ if __name__ == "__main__":
     # **************************************************************************
 
     # Load tile metadata ...
-    with open("OrdnanceSurveyBackgroundImages/miniscale.json", mode = "rt", encoding = "utf-8") as fObj:
+    with open(
+        "OrdnanceSurveyBackgroundImages/miniscale.json",
+        encoding = "utf-8",
+            mode = "rt",
+    ) as fObj:
         meta = json.load(fObj)
 
     # Loop over radii (except the first one) ...
@@ -337,7 +363,10 @@ if __name__ == "__main__":
         print(f"Summarising for a radius of {key} ...")
 
         # Initialize array ...
-        areas = numpy.zeros(len(names), dtype = numpy.float64)                  # [m2]
+        areas = numpy.zeros(
+            len(names),
+            dtype = numpy.float64,
+        )                                                                       # [m2]
 
         # Loop over stations ...
         for i, name in enumerate(names):
@@ -443,7 +472,11 @@ if __name__ == "__main__":
         keys = keys[::-1]
 
         # Save the Top 25 ...
-        with open(f"howMuchLandv2_plot2_{key}.csv", mode = "wt", encoding = "utf-8") as fObj:
+        with open(
+            f"howMuchLandv2_plot2_{key}.csv",
+            encoding = "utf-8",
+                mode = "wt",
+        ) as fObj:
             fObj.write("name,area [m2],area [%]\n")
             for i in range(25):
                 fObj.write(f"{names[keys[i]]},{areas[keys[i]]:e},{percs[keys[i]]:e}\n")
