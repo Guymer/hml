@@ -208,6 +208,9 @@ if __name__ == "__main__":
     # Create axis ...
     ax = pyguymer3.geo.add_axis(
         fg,
+              add_background = False,
+              add_coastlines = True,
+               add_gridlines = True,
         coastlines_edgecolor = "white",
                        debug = args.debug,
                         dist = 340.0e3,
@@ -388,10 +391,13 @@ if __name__ == "__main__":
         # Create axis ...
         ax = pyguymer3.geo.add_axis(
             fg,
-            debug = args.debug,
-             dist = 340.0e3,
-              lat = 52.9,
-              lon = -3.0,
+            add_background = False,
+            add_coastlines = False,
+             add_gridlines = False,
+                     debug = args.debug,
+                      dist = 340.0e3,
+                       lat = 52.9,
+                       lon = -3.0,
         )
 
         # Configure axis ...

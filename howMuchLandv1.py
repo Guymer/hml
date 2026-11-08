@@ -513,10 +513,13 @@ if __name__ == "__main__":
         # Create axis ...
         ax = pyguymer3.geo.add_axis(
             fg,
-            debug = args.debug,
-             dist = 30.0e3,
-              lat = lat,
-              lon = lon,
+            add_background = False,
+            add_coastlines = False,
+             add_gridlines = False,
+                     debug = args.debug,
+                      dist = 30.0e3,
+                       lat = lat,
+                       lon = lon,
         )
 
         # Calculate the regrid shape based off the resolution and the size of
